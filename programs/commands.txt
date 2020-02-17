@@ -1,0 +1,7 @@
+=>Format queries
+makeblastdb -in queries.fastas -out queries.db -dbtype prot
+
+
+=>Run Psi-blast
+
+psiblast -db queries.db -in_pssm models -outfmt 6 > script_conpa.txt
