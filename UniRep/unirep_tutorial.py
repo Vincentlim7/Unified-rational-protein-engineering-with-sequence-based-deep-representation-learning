@@ -59,13 +59,49 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 # UniRep needs to receive data in the correct format, a (batch_size, max_seq_len) matrix with integer values, where the integers correspond to an amino acid label at that position, and the end of the sequence is padded with 0s until the max sequence length to form a non-ragged rectangular matrix. We provide a formatting function to translate a string of amino acids into a list of integers with the correct codex:
 
-# In[4]:
+# In[24]:
 
 
 seq = "MRKGEELFTGVVPILVELDGDVNGHKFSVRGEGEGDATNGKLTLKFICTTGKLPVPWPTLVTTLTYGVQCFARYPDHMKQHDFFKSAMPEGYVQERTISFKDDGTYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNFNSHNVYITADKQKNGIKANFKIRHNVEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSVLSKDPNEKRDHMVLLEFVTAAGITHGMDELYK"
 
 
-# In[5]:
+# In[177]:
+
+
+def random_line(file_name):
+    lines = open(file_name).read().splitlines()
+    return np.random.choice(lines).split()
+
+def get_seq(file_name):
+    f = open(file_name, "r")
+    next(f)
+    seq = ""
+    for line in f:
+        tmp = line.rstrip()    # Supprimer le "\n"
+        seq += tmp
+    f.close
+    seq_vector = np.array(b.format_seq(seq))
+    return seq, seq_vector
+
+protein = open(protein_list_file).readline().split()
+print(protein)
+
+random_protein = random_line(protein_list_file)
+print(random_protein)
+
+file_name = "dataset/fastas/" + protein[0] + ".fasta"
+
+seq, seq_vector = get_seq(file_name)
+
+print("Studied sequence :")
+print(seq + "\n")
+print("Sequence size : " + str(len(seq)) + "\n")
+print("Vector representation of the sequence :\n" + str(seq_vector) + "\n")
+print("Vector size : " + str(len(seq_vector)) + "\n")
+print("Is seq a valide sequence ?\n" + str(b.is_valid_seq(seq)) + "\n")
+
+
+# In[27]:
 
 
 np.array(b.format_seq(seq))
@@ -85,7 +121,7 @@ b.is_valid_seq(seq)
 # 
 # Sequence formatting can be done as follows:
 
-# In[8]:
+# In[74]:
 
 
 # Before you can train your model, 
@@ -101,7 +137,7 @@ with open("seqs.txt", "r") as source:
 
 # This is what the integer format looks like
 
-# In[9]:
+# In[73]:
 
 
 get_ipython().system('head -n1 formatted.txt')
