@@ -50,7 +50,7 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[7]:
+# In[3]:
 
 
 batch_size = 12
@@ -59,103 +59,13 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 # UniRep needs to receive data in the correct format, a (batch_size, max_seq_len) matrix with integer values, where the integers correspond to an amino acid label at that position, and the end of the sequence is padded with 0s until the max sequence length to form a non-ragged rectangular matrix. We provide a formatting function to translate a string of amino acids into a list of integers with the correct codex:
 
-# In[8]:
+# In[4]:
 
 
 seq = "MRKGEELFTGVVPILVELDGDVNGHKFSVRGEGEGDATNGKLTLKFICTTGKLPVPWPTLVTTLTYGVQCFARYPDHMKQHDFFKSAMPEGYVQERTISFKDDGTYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNFNSHNVYITADKQKNGIKANFKIRHNVEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSVLSKDPNEKRDHMVLLEFVTAAGITHGMDELYK"
 
 
-# In[11]:
-
-
-from scipy.spatial import distance
-a = [1, 2, 3]
-b = [4, 5, 6]
-dst = distance.euclidean(a, b)
-c = np.zeros((4, 6))
-print(c)
-print(a+c)
-print(dst)
-
-
-# In[10]:
-
-
-from scipy.spatial import distance
-
-def random_line(file_name):
-    lines = open(file_name).read().splitlines()
-    return np.random.choice(lines).split()
-
-def get_seq(file_name):
-    f = open("dataset/fastas/" + file_name + ".fasta", "r")
-    next(f)
-    seq = ""
-    for line in f:
-        tmp = line.rstrip()    # Supprimer le "\n"
-        seq += tmp
-    f.close
-    seq_vector = np.array(b.format_seq(seq))
-    return seq, seq_vector
-
-f = open("fullProtein.list")
-
-line = next(f).split()
-studied_prot = get_seq(line[0])
-
-same_class = []
-rd_class = []
-
-nb_seq_class = 5
-
-
-for i in range (nb_seq_class): #Recuperer les noms de fichiers
-    line = next(f).split()
-    same_class.append(line[0])
-    rd_protein =random_line("fullProtein.list")
-    rd_class.append(line[0])
-    
-f.close
-
-print(same_class)
-print(rd_class)
-
-seq_list1 = [] # Recuperer les sequences
-dist1 = []
-for i in range(nb_seq_class):
-    prot = get_seq(same_class[0])
-    seq_list1.append(prot)
-    #dist1.append(distance.euclidean(studied_prot[1], prot[1]))
-
-seq_list2 = []
-dist2 = []
-for i in range(nb_seq_class):
-    prot = get_seq(rd_class[0])
-    seq_list2.append(prot)
-    #dist2.append(distance.euclidean(studied_prot[1], prot[1]))
-
-print(seq_list1)
-print(seq_list2)
-
-"""rd_protein = random_line("fullProtein.list")
-print(random_protein)
-
-file_name = "dataset/fastas/" + protein[0] + ".fasta"
-rd_file_name = "dataset/fastas/" + rd_protein[0] + ".fasta"
-
-seq, seq_vector = get_seq(file_name)
-rd_seq, rd_seq_vector = get_seq(rd_file_name)
-
-print("Studied sequence :")
-print(seq + "\n")
-print("Sequence size : " + str(len(seq)) + "\n")
-print("Vector representation of the sequence :\n" + str(seq_vector) + "\n")
-print("Vector size : " + str(len(seq_vector)) + "\n")
-print("Is seq a valide sequence ?\n" + str(b.is_valid_seq(seq)) + "\n")
-"""
-
-
-# In[9]:
+# In[5]:
 
 
 np.array(b.format_seq(seq))
@@ -163,7 +73,7 @@ np.array(b.format_seq(seq))
 
 # We also provide a function that will check your amino acid sequences don't contain any characters which will break the UniRep model.
 
-# In[ ]:
+# In[6]:
 
 
 b.is_valid_seq(seq)
@@ -175,7 +85,7 @@ b.is_valid_seq(seq)
 # 
 # Sequence formatting can be done as follows:
 
-# In[154]:
+# In[7]:
 
 
 # Before you can train your model, 
@@ -191,7 +101,7 @@ with open("seqs.txt", "r") as source:
 
 # This is what the integer format looks like
 
-# In[73]:
+# In[9]:
 
 
 get_ipython().system('head -n1 formatted.txt')
@@ -209,7 +119,7 @@ get_ipython().system('head -n1 formatted.txt')
 # - Automatically padding the sequences with zeros so the returned batch is a perfect rectangle
 # - Automatically repeating the dataset
 
-# In[26]:
+# In[10]:
 
 
 bucket_op = b.bucket_batch_pad("formatted.txt", interval=1000) # Large interval
@@ -219,7 +129,7 @@ bucket_op = b.bucket_batch_pad("formatted.txt", interval=1000) # Large interval
 
 # Now that we have the `bucket_op`, we can simply `sess.run()` it to get a correctly formatted batch
 
-# In[28]:
+# In[11]:
 
 
 with tf.Session() as sess:
@@ -236,7 +146,7 @@ print(batch.shape)
 
 # First, obtain all of the ops needed to output a representation
 
-# In[159]:
+# In[12]:
 
 
 final_hidden, x_placeholder, batch_size_placeholder, seq_length_placeholder, initial_state_placeholder = (
@@ -253,7 +163,7 @@ final_hidden, x_placeholder, batch_size_placeholder, seq_length_placeholder, ini
 # 
 # 3.  Minimizing the loss inside of a TensorFlow session
 
-# In[160]:
+# In[13]:
 
 
 y_placeholder = tf.placeholder(tf.float32, shape=[None,1], name="y")
@@ -271,7 +181,7 @@ loss = tf.losses.mean_squared_error(y_placeholder, prediction)
 
 # You can specifically train the top model first by isolating variables of the "top" scope, and forcing the optimizer to only optimize these.
 
-# In[161]:
+# In[14]:
 
 
 learning_rate=.001
@@ -283,7 +193,7 @@ all_step_op = optimizer.minimize(loss)
 
 # We next need to define a function that allows us to calculate the length each sequence in the batch so that we know what index to use to obtain the right "final" hidden state
 
-# In[162]:
+# In[15]:
 
 
 def nonpad_len(batch):
@@ -296,7 +206,7 @@ nonpad_len(batch)
 
 # We are ready to train. As an illustration, let's learn to predict the number 42 just optimizing the top model.
 
-# In[163]:
+# In[16]:
 
 
 y = [[42]]*batch_size
