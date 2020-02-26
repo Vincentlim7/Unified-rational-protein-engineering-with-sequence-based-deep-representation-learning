@@ -1,8 +1,0 @@
-
-#Download and install required programs
-
-=>Psi-blast
-ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
-
-==>UniRep
-https://github.com/churchlab/UniRep
