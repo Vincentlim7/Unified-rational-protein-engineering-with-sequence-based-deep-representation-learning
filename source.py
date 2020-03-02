@@ -57,9 +57,10 @@ batch_size = 12
 b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
-# In[57]:
+# In[85]:
 
 
+# PLUS BESOIN DE get_rd_prot() JE CROIS
 def get_rd_prot():    # Retourne une ligne aleatoire du fichier fullProtein.list
     lines = open("fullProtein.list").read().splitlines()
     return np.random.choice(lines).split() # return ("protein name", "protein class)
@@ -97,8 +98,8 @@ def dic_init(avg = True):
     f = open("partialProtein.list", "r")
     for line in f:
         infos = line.split()
-        protein = infos[0]
-        classe = infos[1]
+        protein = infos[0]    # Protein name
+        classe = infos[1]     # Protein class
         if classe not in classes:
             classes[classe] = dict()
         if avg:
@@ -107,13 +108,32 @@ def dic_init(avg = True):
             classes[classe][protein] = get_concat_vec(get_prot_seq(protein))
     return classes
 
-def dist_intra(protein_dict):
+def dist_intra(protein_dict): # Fonctionne 
     dist_intra = dict()
     for classe, protein_list in protein_dict.items():
         for protein_a, seq_a in protein_list.items():
+            dist_intra[protein_a] = (None, np.inf)
             for protein_b, seq_b in protein_list.items():
                 if protein_a == protein_b:
                     continue
+                dist = distance.euclidean(seq_a, seq_b)
+                if dist < dist_intra[protein_a][1]:
+                    dist_intra[protein_a] = (protein_b, dist)
+    return dist_intra
+
+def dist_extra(protein_dict): # A CODER 
+    dist_extra = dict()
+    for classe, protein_list in protein_dict.items():
+        for protein_a, seq_a in protein_list.items():
+            dist_extra[protein_a] = (None, np.inf)
+            for protein_b, seq_b in protein_list.items():
+                if protein_a == protein_b:
+                    continue
+                dist = distance.euclidean(seq_a, seq_b)
+                if dist < dist_extra[protein_a][1]:
+                    dist_extra[protein_a] = (protein_b, dist)
+    return dist_extra
+                    
                 
 
 
@@ -126,12 +146,11 @@ print(get_avg_vec(seq))
 print(get_concat_vec(seq))
 
 
-# In[64]:
+# In[78]:
 
 
 classes = dic_init()
 print(classes)
-print(get_classe('d1ngka_'))
 
 
 # In[68]:
@@ -143,6 +162,13 @@ prot_b = classes["a.1.1.1"]["d1ngka_"]
 print(prot_a)
 print(prot_b)
 print(distance.euclidean(prot_a, prot_b))
+
+
+# In[86]:
+
+
+dist_intra = dist_intra(classes)
+print(dist_intra)
 
 
 # In[59]:
