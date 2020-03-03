@@ -63,52 +63,52 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 from scipy.spatial import distance
 
 def get_prot_seq(file_name):
-    f = open("dataset/fastas/" + file_name + ".fasta", "r")
-    next(f)
+    f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
+    next(f) # Skipping the first line (containing the protein's name)
     seq = ""
-    for line in f:
-        tmp = line.rstrip()    # Supprimer le "\n"
+    for line in f: # Retriving the sequence
+        tmp = line.rstrip()    # Deleting "\n"
         seq += tmp
     f.close
     return seq
 
 def get_avg_vec(seq):
-    avg_vec = b.get_rep(seq)[0]
+    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
     return avg_vec
 
 def get_concat_vec(seq):
-    avg_vec = b.get_rep(seq)[0]
-    fnl_hid_vec = b.get_rep(seq)[1]
-    fnl_cell_vec = b.get_rep(seq)[2]
-    seq_vec = np.concatenate((avg_vec, fnl_hid_vec, fnl_cell_vec))
+    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
+    fnl_hid_vec = b.get_rep(seq)[1] # Vector 2 : final hidden
+    fnl_cell_vec = b.get_rep(seq)[2] # Vector 3 : final cell
+    seq_vec = np.concatenate((avg_vec, fnl_hid_vec, fnl_cell_vec)) # Concatenation of all three vectors
     return seq_vec
 
-def get_classe(searched_protein):
-    for classe, protein_list in classes.items():
-        for protein_name, seq in protein_list.items():
+def get_classe(searched_protein): # Returning the protein's category (the key in the level 0 dictionnary)
+    for classe, protein_list in classes.items(): # Browsing the category dictionnary (level 0)
+        for protein_name, seq in protein_list.items(): # Browsing the protein dictionnary (level 1)
             if protein_name == searched_protein:
                 return classe
 
 
-def dic_init(avg = True):
+def dic_init(avg = True): # Initializing the nested dictionnary containing all proteins and their vector (avg or concatenated)
     classes = dict()
     f = open("partialProtein.list", "r")
-    for line in f:
+    for line in f: # Browsing all protein
         infos = line.split()
         protein = infos[0]    # Protein name
-        classe = infos[1]     # Protein class
-        if classe not in classes:
+        classe = infos[1]     # Protein category
+        if classe not in classes: # Adding new category key if it doesn't exist
             classes[classe] = dict()
-        if avg:
+        if avg: # adding the avg or concatenated vector
             classes[classe][protein] = get_avg_vec(get_prot_seq(protein))
         else:
             classes[classe][protein] = get_concat_vec(get_prot_seq(protein))
     return classes
 
-def get_dist_intra(protein_dict): # Fonctionne 
+def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
     dist_intra = dict()
     for classe, protein_list in protein_dict.items():
-        if classe not in dist_intra:
+        if classe not in dist_intra: # Adding new category key if it doesn't exist
             dist_intra[classe] = dict()
         for protein_a, vec_a in protein_list.items():
             dist_intra[classe][protein_a] = (None, np.inf)
@@ -120,10 +120,10 @@ def get_dist_intra(protein_dict): # Fonctionne
                     dist_intra[classe][protein_a] = (protein_b, dist)
     return dist_intra
 
-def get_dist_extra(protein_dict): # A CODER 
+def get_dist_extra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of different category
     dist_extra = dict()
     for classe_a, protein_list_a in protein_dict.items():
-        if classe_a not in dist_extra:
+        if classe_a not in dist_extra: # Adding new category key if it doesn't exist
             dist_extra[classe_a] = dict()
         for protein_a, vec_a in protein_list_a.items():
             dist_extra[classe_a][protein_a] = (None, np.inf)
