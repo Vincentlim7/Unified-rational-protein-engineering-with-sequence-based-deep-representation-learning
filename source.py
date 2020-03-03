@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[4]:
+# In[2]:
 
 
 import tensorflow as tf
@@ -50,14 +50,14 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[5]:
+# In[3]:
 
 
 batch_size = 12
 b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
-# In[18]:
+# In[4]:
 
 
 from scipy.spatial import distance
@@ -78,8 +78,7 @@ def get_prot_seq(file_name):
 
 def get_avg_vec(seq):
     avg_vec = b.get_rep(seq)[0]
-    return avg_vecat_vec(get_prot_seq(protein))
-    return classes
+    return avg_vec
 
 def get_concat_vec(seq):
     avg_vec = b.get_rep(seq)[0]
@@ -141,7 +140,7 @@ def dist_extra(protein_dict): # A CODER
                 
 
 
-# In[69]:
+# In[5]:
 
 
 # EXEMPLE VECTEURS
@@ -150,14 +149,14 @@ print(get_avg_vec(seq))
 print(get_concat_vec(seq))
 
 
-# In[9]:
+# In[6]:
 
 
 classes = dic_init()
 print(classes)
 
 
-# In[15]:
+# In[7]:
 
 
 # EXEMPLE DISTANCE EUCLIDIENNE
@@ -168,7 +167,7 @@ print(prot_b)
 print(distance.euclidean(prot_a, prot_b))
 
 
-# In[19]:
+# In[8]:
 
 
 dist_intra = dist_intra(classes)
