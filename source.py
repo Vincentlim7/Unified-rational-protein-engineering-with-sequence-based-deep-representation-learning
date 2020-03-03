@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[2]:
+# In[4]:
 
 
 import tensorflow as tf
@@ -50,16 +50,17 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[3]:
+# In[5]:
 
 
 batch_size = 12
 b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
-# In[85]:
+# In[18]:
 
 
+from scipy.spatial import distance
 # PLUS BESOIN DE get_rd_prot() JE CROIS
 def get_rd_prot():    # Retourne une ligne aleatoire du fichier fullProtein.list
     lines = open("fullProtein.list").read().splitlines()
@@ -77,7 +78,8 @@ def get_prot_seq(file_name):
 
 def get_avg_vec(seq):
     avg_vec = b.get_rep(seq)[0]
-    return avg_vec
+    return avg_vecat_vec(get_prot_seq(protein))
+    return classes
 
 def get_concat_vec(seq):
     avg_vec = b.get_rep(seq)[0]
@@ -111,14 +113,16 @@ def dic_init(avg = True):
 def dist_intra(protein_dict): # Fonctionne 
     dist_intra = dict()
     for classe, protein_list in protein_dict.items():
-        for protein_a, seq_a in protein_list.items():
-            dist_intra[protein_a] = (None, np.inf)
-            for protein_b, seq_b in protein_list.items():
+        if classe not in dist_intra:
+            dist_intra[classe] = dict()
+        for protein_a, vec_a in protein_list.items():
+            dist_intra[classe][protein_a] = (None, np.inf)
+            for protein_b, vec_b in protein_list.items():
                 if protein_a == protein_b:
                     continue
-                dist = distance.euclidean(seq_a, seq_b)
-                if dist < dist_intra[protein_a][1]:
-                    dist_intra[protein_a] = (protein_b, dist)
+                dist = distance.euclidean(vec_a, vec_b)
+                if dist < dist_intra[classe][protein_a][1]:
+                    dist_intra[classe][protein_a] = (protein_b, dist)
     return dist_intra
 
 def dist_extra(protein_dict): # A CODER 
@@ -146,14 +150,14 @@ print(get_avg_vec(seq))
 print(get_concat_vec(seq))
 
 
-# In[78]:
+# In[9]:
 
 
 classes = dic_init()
 print(classes)
 
 
-# In[68]:
+# In[15]:
 
 
 # EXEMPLE DISTANCE EUCLIDIENNE
@@ -164,7 +168,7 @@ print(prot_b)
 print(distance.euclidean(prot_a, prot_b))
 
 
-# In[86]:
+# In[19]:
 
 
 dist_intra = dist_intra(classes)
