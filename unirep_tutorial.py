@@ -163,7 +163,11 @@ np.array(b.format_seq(seq))
 
 # We also provide a function that will check your amino acid sequences don't contain any characters which will break the UniRep model.
 
+<<<<<<< HEAD:unirep_tutorial.py
 # In[ ]:
+=======
+# In[6]:
+>>>>>>> develop:unirep_tutorial.py
 
 
 b.is_valid_seq(seq)
@@ -175,7 +179,11 @@ b.is_valid_seq(seq)
 # 
 # Sequence formatting can be done as follows:
 
+<<<<<<< HEAD:unirep_tutorial.py
 # In[154]:
+=======
+# In[7]:
+>>>>>>> develop:unirep_tutorial.py
 
 
 # Before you can train your model, 
