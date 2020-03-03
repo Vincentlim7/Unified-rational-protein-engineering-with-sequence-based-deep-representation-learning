@@ -21,6 +21,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 import tensorflow as tf
 import numpy as np
 from scipy.spatial import distance
+import matplotlib.pyplot as plt
 
 # Set seeds
 tf.set_random_seed(42)
@@ -69,10 +70,12 @@ def get_prot_seq(file_name):
         tmp = line.rstrip()    # Deleting "\n"
         seq += tmp
     f.close
+    print("lecture fichier")
     return seq
 
 def get_avg_vec(seq):
     avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
+    print("calcul vecteur")
     return avg_vec
 
 def get_concat_vec(seq):
@@ -135,7 +138,36 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
                         dist_extra[classe_a][protein_a] = (protein_b, dist)
     return dist_extra
                     
-                
+def histo(dist_intra, dist_extra):
+    x_intra = []
+    y_intra = []
+    x_extra = []
+    y_extra = []
+
+    for classe, protein_list in dist_intra.items():
+        classe_dist = np.inf
+        for protein, val in protein_list.items():
+            if(val[1] < classe_dist):
+                classe_dist = val[1]
+        if(classe_dist != np.inf):
+            x_intra.append(classe_dist)
+            y_intra.append(len(protein_list))
+
+    for classe, protein_list in dist_extra.items():
+        classe_dist = np.inf
+        for protein, val in protein_list.items():
+            if(val[1] < classe_dist):
+                classe_dist = val[1]
+        if(classe_dist != np.inf):
+            x_extra.append(classe_dist)
+            y_extra.append(len(protein_list))
+
+    plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
+    plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
+    plt.xlabel('Distance')
+    plt.ylabel('Nb Sequence')
+    plt.legend(loc='upper right')
+    plt.show() 
 
 
 # In[5]:
@@ -158,3 +190,12 @@ print(dist_intra)
 dist_extra = get_dist_extra(classes)
 print(dist_extra)
 
+<<<<<<< HEAD
+=======
+
+# In[9]:
+
+
+histo(dist_intra, dist_extra)
+
+>>>>>>> histo finished
