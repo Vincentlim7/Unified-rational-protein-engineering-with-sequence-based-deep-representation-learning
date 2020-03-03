@@ -144,7 +144,7 @@ def histo(dist_intra, dist_extra):
     x_extra = []
     y_extra = []
 
-    for classe, protein_list in dist_intra.items():
+    for classe, protein_list in dist_intra.items(): # Retrieving smallest dist value in dist_intra for each protein
         classe_dist = np.inf
         for protein, val in protein_list.items():
             if(val[1] < classe_dist):
@@ -153,7 +153,7 @@ def histo(dist_intra, dist_extra):
             x_intra.append(classe_dist)
             y_intra.append(len(protein_list))
 
-    for classe, protein_list in dist_extra.items():
+    for classe, protein_list in dist_extra.items(): # Retrieving smallest dist value in dist_extra for each protein
         classe_dist = np.inf
         for protein, val in protein_list.items():
             if(val[1] < classe_dist):
