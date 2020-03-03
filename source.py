@@ -57,7 +57,7 @@ batch_size = 12
 b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
-# In[60]:
+# In[4]:
 
 
 from scipy.spatial import distance
@@ -139,7 +139,7 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
                 
 
 
-# In[61]:
+# In[5]:
 
 
 # EXEMPLE VECTEURS
@@ -148,28 +148,28 @@ print(get_avg_vec(seq))
 print(get_concat_vec(seq))
 
 
-# In[62]:
+# In[6]:
 
 
 classes = dic_init()
 print(classes)
 
 
-# In[64]:
+# In[7]:
 
 
 dist_intra = get_dist_intra(classes)
 print(dist_intra)
 
 
-# In[65]:
+# In[8]:
 
 
 dist_extra = get_dist_extra(classes)
 print(dist_extra)
 
 
-# In[66]:
+# In[9]:
 
 
 # Testing manually if dist intra/extra are correct
