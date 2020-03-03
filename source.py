@@ -78,8 +78,7 @@ def get_prot_seq(file_name):
 
 def get_avg_vec(seq):
     avg_vec = b.get_rep(seq)[0]
-    return avg_vecat_vec(get_prot_seq(protein))
-    return classes
+    return avg_vec
 
 def get_concat_vec(seq):
     avg_vec = b.get_rep(seq)[0]
