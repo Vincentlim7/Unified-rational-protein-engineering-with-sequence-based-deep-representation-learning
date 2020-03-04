@@ -20,6 +20,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 import tensorflow as tf
 import numpy as np
+from scipy.spatial import distance
 
 # Set seeds
 tf.set_random_seed(42)
@@ -59,8 +60,6 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 # In[4]:
 
-
-from scipy.spatial import distance
 
 def get_prot_seq(file_name):
     f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
@@ -142,42 +141,20 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
 # In[5]:
 
 
-# EXEMPLE VECTEURS
-seq = "MRKGEELFTGVVPILVELDGDVNGHKFSVRGEGEGDATNGKLTLKFICTTGKLPVPWPTLVTTLTYGVQCFARYPDHMKQHDFFKSAMPEGYVQERTISFKDDGTYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNFNSHNVYITADKQKNGIKANFKIRHNVEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSVLSKDPNEKRDHMVLLEFVTAAGITHGMDELYK"
-print(get_avg_vec(seq))
-print(get_concat_vec(seq))
-
-
-# In[6]:
-
-
 classes = dic_init()
 print(classes)
 
 
-# In[7]:
+# In[6]:
 
 
 dist_intra = get_dist_intra(classes)
 print(dist_intra)
 
 
-# In[8]:
+# In[7]:
 
 
 dist_extra = get_dist_extra(classes)
 print(dist_extra)
-
-
-# In[9]:
-
-
-# Testing manually if dist intra/extra are correct
-for key, value in classes.items():
-    print(key)
-    for key2, value2, in value.items():
-        print("  ", key2)
-prot1 = classes["a.1.1.2"]["d1sctb_"]
-prot2 = classes["a.1.1.4"]["d1kr7a_"]
-print(distance.euclidean(prot1, prot2))
 
