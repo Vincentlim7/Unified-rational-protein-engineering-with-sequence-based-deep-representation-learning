@@ -190,12 +190,9 @@ print(dist_intra)
 dist_extra = get_dist_extra(classes)
 print(dist_extra)
 
-<<<<<<< HEAD
-=======
 
 # In[8]:
 
 
 histo(dist_intra, dist_extra)
 
->>>>>>> histo finished
