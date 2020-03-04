@@ -7,7 +7,7 @@
 
 # Use the 64-unit or the 1900-unit model?
 
-# In[1]:
+# In[ ]:
 
 
 USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 64 dimensional one.
@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[2]:
+# In[ ]:
 
 
 import tensorflow as tf
@@ -52,14 +52,14 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[3]:
+# In[ ]:
 
 
 batch_size = 12
 b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
-# In[4]:
+# In[ ]:
 
 
 def get_prot_seq(file_name):
@@ -170,28 +170,28 @@ def histo(dist_intra, dist_extra):
     plt.show() 
 
 
-# In[5]:
+# In[ ]:
 
 
 classes = dic_init()
 print(classes)
 
 
-# In[6]:
+# In[ ]:
 
 
 dist_intra = get_dist_intra(classes)
 print(dist_intra)
 
 
-# In[7]:
+# In[ ]:
 
 
 dist_extra = get_dist_extra(classes)
 print(dist_extra)
 
 
-# In[8]:
+# In[ ]:
 
 
 histo(dist_intra, dist_extra)
