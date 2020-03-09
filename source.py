@@ -110,7 +110,7 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
         cpt += 1
         if cpt % 100 == 0:
             print("Nombre proteines lues : ", cpt)
-        if cpt % 1000 == 0: # Periodical save every 1000 protein processed
+        if cpt % 100 == 0: # Periodical save every 100 protein processed
             np.save("database/data_avg" + str(cpt) + ".npy", classes_avg)
             np.save("database/data_concat" + str(cpt) + ".npy", classes_concat)
     np.save("database/data_avg.npy", classes_avg) # Saving whole database
