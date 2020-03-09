@@ -96,6 +96,7 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
     classes_concat = dict()
     f = open("fullProtein.list", "r")
     cpt = 0 # Number of protein already processed
+    start_time = time.time()
     for line in f: # Browsing all protein
         infos = line.split()
         protein = infos[0]    # Protein name
@@ -108,11 +109,13 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
         classes_avg[classe][protein] = get_avg_vec(prot_seq) # Retrieving and stocking avg vector
         classes_concat[classe][protein] = get_concat_vec(prot_seq) # Retrieving and stocking concat vector
         cpt += 1
-        if cpt % 100 == 0:
-            print("Nombre proteines lues : ", cpt)
         if cpt % 100 == 0: # Periodical save every 100 protein processed
+            print("Nombre proteines lues : ", cpt)
             np.save("database/data_avg" + str(cpt) + ".npy", classes_avg)
             np.save("database/data_concat" + str(cpt) + ".npy", classes_concat)
+            elapsed_time = time.time() - start_time
+            print(elapsed_time)
+            start_time = time.time() # Reset timer
     np.save("database/data_avg.npy", classes_avg) # Saving whole database
     np.save("database/data_concat.npy", classes_concat)
     return classes_avg, classes_concat
@@ -183,10 +186,10 @@ def histo(dist_intra, dist_extra):
 # In[ ]:
 
 
-start_time = time.time()
+total_start_time = time.time()
 classes_avg, classes_concat = dic_init()
-elapsed_time = time.time() - start_time
-print(elapsed_time)
+total_elapsed_time = time.time() - total_start_time
+print(total_elapsed_time)
 
 
 # In[ ]:
