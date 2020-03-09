@@ -189,11 +189,6 @@ elapsed_time = time.time() - start_time
 print(elapsed_time)
 
 
-# Avec PartialProteinList contenant 3 proteines
-# 9.621617078781128 --> temps pour dic_init seulement pour vecteurs avg
-# 29.262553930282593 --> temps pour dic_init seulement pour vecteurs concat
-# 41.558212995529175 --> temps pour dic_init pour les deux vecteurs
-
 # In[ ]:
 
 
