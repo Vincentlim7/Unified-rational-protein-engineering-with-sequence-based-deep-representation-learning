@@ -22,6 +22,7 @@ import tensorflow as tf
 import numpy as np
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
+import time
 
 # Set seeds
 tf.set_random_seed(42)
@@ -70,12 +71,10 @@ def get_prot_seq(file_name):
         tmp = line.rstrip()    # Deleting "\n"
         seq += tmp
     f.close
-    print("lecture fichier")
     return seq
 
 def get_avg_vec(seq):
     avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
-    print("calcul vecteur")
     return avg_vec
 
 def get_concat_vec(seq):
@@ -92,20 +91,31 @@ def get_classe(searched_protein): # Returning the protein's category (the key in
                 return classe
 
 
-def dic_init(avg = True): # Initializing the nested dictionnary containing all proteins and their vector (avg or concatenated)
-    classes = dict()
-    f = open("partialProtein.list", "r")
+def dic_init(): # Initializing nested dictionnaries all proteins and their vector (avg or concatenated)
+    classes_avg = dict()
+    classes_concat = dict()
+    f = open("fullProtein.list", "r")
+    cpt = 0 # Number of protein already processed
     for line in f: # Browsing all protein
         infos = line.split()
         protein = infos[0]    # Protein name
         classe = infos[1]     # Protein category
-        if classe not in classes: # Adding new category key if it doesn't exist
-            classes[classe] = dict()
-        if avg: # adding the avg or concatenated vector
-            classes[classe][protein] = get_avg_vec(get_prot_seq(protein))
-        else:
-            classes[classe][protein] = get_concat_vec(get_prot_seq(protein))
-    return classes
+        if classe not in classes_avg: # Adding new category key if it doesn't exist
+            classes_avg[classe] = dict()
+        if classe not in classes_concat: # Adding new category key if it doesn't exist
+            classes_concat[classe] = dict()
+        prot_seq = get_prot_seq(protein) # Retrieving protein sequence
+        classes_avg[classe][protein] = get_avg_vec(prot_seq) # Retrieving and stocking avg vector
+        classes_concat[classe][protein] = get_concat_vec(prot_seq) # Retrieving and stocking concat vector
+        cpt += 1
+        if cpt % 100 == 0:
+            print("Nombre proteines lues : ", cpt)
+        if cpt % 1000 == 0: # Periodical save every 1000 protein processed
+            np.save("database/data_avg" + str(cpt) + ".npy", classes_avg)
+            np.save("database/data_concat" + str(cpt) + ".npy", classes_concat)
+    np.save("database/data_avg.npy", classes_avg) # Saving whole database
+    np.save("database/data_concat.npy", classes_concat)
+    return classes_avg, classes_concat
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
     dist_intra = dict()
@@ -173,9 +183,16 @@ def histo(dist_intra, dist_extra):
 # In[ ]:
 
 
-classes = dic_init()
-print(classes)
+start_time = time.time()
+classes_avg, classes_concat = dic_init()
+elapsed_time = time.time() - start_time
+print(elapsed_time)
 
+
+# Avec PartialProteinList contenant 3 proteines
+# 9.621617078781128 --> temps pour dic_init seulement pour vecteurs avg
+# 29.262553930282593 --> temps pour dic_init seulement pour vecteurs concat
+# 41.558212995529175 --> temps pour dic_init pour les deux vecteurs
 
 # In[ ]:
 
