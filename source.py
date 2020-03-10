@@ -195,19 +195,26 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-dist_intra = get_dist_intra(classes)
-print(dist_intra)
+classes_avg = np.load("database/data_avg900.npy")[()]
+classes_concat = np.load("database/data_concat900.npy")[()]
 
 
 # In[ ]:
 
 
-dist_extra = get_dist_extra(classes)
-print(dist_extra)
+dist_intra_avg = get_dist_intra(classes_avg)
+dist_intra_concat = get_dist_intra(classes_concat)
 
 
 # In[ ]:
 
 
-histo(dist_intra, dist_extra)
+dist_extra_avg = get_dist_extra(classes_avg)
+dist_extra_concat = get_dist_extra(classes_concat)
+
+
+# In[ ]:
+
+
+histo(dist_intra_avg, dist_extra_avg)
 
