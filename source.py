@@ -94,7 +94,7 @@ def get_classe(searched_protein): # Returning the protein's category (the key in
 def dic_init(): # Initializing nested dictionnaries all proteins and their vector (avg or concatenated)
     classes_avg = dict()
     classes_concat = dict()
-    f = open("fullProtein.list", "r")
+    f = open("partialProtein.list", "r")
     cpt = 0 # Number of protein already processed
     start_time = time.time()
     for line in f: # Browsing all protein
@@ -111,13 +111,13 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
         cpt += 1
         if cpt % 100 == 0: # Periodical save every 100 protein processed
             print("Nombre proteines lues : ", cpt)
-            np.save("database/data_avg" + str(cpt) + ".npy", classes_avg)
-            np.save("database/data_concat" + str(cpt) + ".npy", classes_concat)
+            np.save("database/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
+            np.save("database/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
             elapsed_time = time.time() - start_time
             print(elapsed_time)
             start_time = time.time() # Reset timer
-    np.save("database/data_avg.npy", classes_avg) # Saving whole database
-    np.save("database/data_concat.npy", classes_concat)
+    np.save("database/next_batch/data_avg.npy", classes_avg) # Saving whole database
+    np.save("database/next_batch/data_concat.npy", classes_concat)
     return classes_avg, classes_concat
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
@@ -195,8 +195,8 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/data_avg900.npy")[()]
-classes_concat = np.load("database/data_concat900.npy")[()]
+classes_avg = np.load("database/data_avg1294.npy")[()]
+classes_concat = np.load("database/data_concat1294.npy")[()]
 
 
 # In[ ]:
@@ -217,4 +217,14 @@ dist_extra_concat = get_dist_extra(classes_concat)
 
 
 histo(dist_intra_avg, dist_extra_avg)
+
+
+# In[ ]:
+
+
+cpt = 0
+for classe, protein_list in classes_avg.items():
+    for protein_a, vec_a in protein_list.items():
+        cpt += 1
+print(cpt)
 
