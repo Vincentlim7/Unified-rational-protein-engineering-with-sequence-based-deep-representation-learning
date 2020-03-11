@@ -64,6 +64,8 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
 def get_prot_seq(file_name):
+    start_time_seq = time.time()
+
     f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
     next(f) # Skipping the first line (containing the protein's name)
     seq = ""
@@ -71,17 +73,23 @@ def get_prot_seq(file_name):
         tmp = line.rstrip()    # Deleting "\n"
         seq += tmp
     f.close
+    elapsed_time_seq = time.time() - start_time_seq
+    print("fichier lu, temps : ", elapsed_time_seq)
     return seq
 
 def get_avg_vec(seq):
+    start_time_avg = time.time()
     avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
+    elapsed_time_avg = time.time() - start_time_avg
+    print("vecteur avg, temps : ", elapsed_time_avg)
     return avg_vec
 
 def get_concat_vec(seq):
-    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
-    fnl_hid_vec = b.get_rep(seq)[1] # Vector 2 : final hidden
-    fnl_cell_vec = b.get_rep(seq)[2] # Vector 3 : final cell
-    seq_vec = np.concatenate((avg_vec, fnl_hid_vec, fnl_cell_vec)) # Concatenation of all three vectors
+    start_time_concat = time.time()
+    seq_vec = b.get_rep(seq)
+    seq_vec = np.reshape(seq_vec, 192) # Concatenation of all three vectors
+    elapsed_time_concat = time.time() - start_time_concat
+    print("vecteur concat, temps : ", elapsed_time_concat)
     return seq_vec
 
 def get_classe(searched_protein): # Returning the protein's category (the key in the level 0 dictionnary)
@@ -180,7 +188,7 @@ def histo(dist_intra, dist_extra):
     plt.xlabel('Distance')
     plt.ylabel('Nb Sequence')
     plt.legend(loc='upper right')
-    plt.show() 
+    plt.show()
 
 
 # In[ ]:
@@ -217,6 +225,12 @@ dist_extra_concat = get_dist_extra(classes_concat)
 
 
 histo(dist_intra_avg, dist_extra_avg)
+
+
+# In[ ]:
+
+
+histo(dist_intra_concat, dist_extra_concat)
 
 
 # In[ ]:
