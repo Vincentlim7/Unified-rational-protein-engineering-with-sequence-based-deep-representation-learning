@@ -64,8 +64,7 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
 def get_prot_seq(file_name):
-    start_time_seq = time.time()
-
+    #lecture_start_time = time.time()
     f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
     next(f) # Skipping the first line (containing the protein's name)
     seq = ""
@@ -73,24 +72,18 @@ def get_prot_seq(file_name):
         tmp = line.rstrip()    # Deleting "\n"
         seq += tmp
     f.close
-    elapsed_time_seq = time.time() - start_time_seq
-    print("fichier lu, temps : ", elapsed_time_seq)
+    #lecture_elapsed_time = time.time() - lecture_start_time
+    #print("Temps lecture fichier : ", lecture_elapsed_time)
     return seq
 
-def get_avg_vec(seq):
-    start_time_avg = time.time()
-    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
-    elapsed_time_avg = time.time() - start_time_avg
-    print("vecteur avg, temps : ", elapsed_time_avg)
-    return avg_vec
-
-def get_concat_vec(seq):
-    start_time_concat = time.time()
-    seq_vec = b.get_rep(seq)
-    seq_vec = np.reshape(seq_vec, 192) # Concatenation of all three vectors
-    elapsed_time_concat = time.time() - start_time_concat
-    print("vecteur concat, temps : ", elapsed_time_concat)
-    return seq_vec
+def get_vecs(seq):
+    #vecs_start_time = time.time()
+    vecs = b.get_rep(seq)
+    avg_vec = vecs[0]
+    concat_vec = np.reshape(vecs, 192) # Concatenation of all three vectors
+    #vecs_elapsed_time = time.time() - vecs_start_time
+    #print("Temps vecs : ", vecs_elapsed_time)
+    return avg_vec, concat_vec
 
 def get_classe(searched_protein): # Returning the protein's category (the key in the level 0 dictionnary)
     for classe, protein_list in classes.items(): # Browsing the category dictionnary (level 0)
@@ -114,16 +107,15 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
         if classe not in classes_concat: # Adding new category key if it doesn't exist
             classes_concat[classe] = dict()
         prot_seq = get_prot_seq(protein) # Retrieving protein sequence
-        classes_avg[classe][protein] = get_avg_vec(prot_seq) # Retrieving and stocking avg vector
-        classes_concat[classe][protein] = get_concat_vec(prot_seq) # Retrieving and stocking concat vector
+        classes_avg[classe][protein], classes_concat[classe][protein] = get_vecs(prot_seq) # Retrieving and stocking vectors
         cpt += 1
         if cpt % 100 == 0: # Periodical save every 100 protein processed
             print("Nombre proteines lues : ", cpt)
-            np.save("database/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
-            np.save("database/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
             elapsed_time = time.time() - start_time
             print(elapsed_time)
             start_time = time.time() # Reset timer
+            np.save("database/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
+            np.save("database/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
     np.save("database/next_batch/data_avg.npy", classes_avg) # Saving whole database
     np.save("database/next_batch/data_concat.npy", classes_concat)
     return classes_avg, classes_concat
@@ -203,8 +195,8 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/data_avg1294.npy")[()]
-classes_concat = np.load("database/data_concat1294.npy")[()]
+classes_avg = np.load("database/data_avg1591.npy")[()]
+classes_concat = np.load("database/data_concat1591.npy")[()]
 
 
 # In[ ]:
@@ -241,4 +233,43 @@ for classe, protein_list in classes_avg.items():
     for protein_a, vec_a in protein_list.items():
         cpt += 1
 print(cpt)
+
+
+# In[ ]:
+
+
+classes_avg2 = np.load("database/next_batch/data_avg300.npy")[()]
+classes_concat2 = np.load("database/next_batch/data_concat300.npy")[()]
+
+
+# In[ ]:
+
+
+del classes_concat2["a.40.1.1"]
+
+
+# In[ ]:
+
+
+classes_avg.update(classes_avg2)
+classes_concat.update(classes_concat2)
+
+
+# In[ ]:
+
+
+np.save("database/data_avg1591.npy", classes_avg)
+np.save("database/data_concat1591.npy", classes_concat)
+
+
+# In[ ]:
+
+
+concat = get_vecs(get_prot_seq("d2v1fa1"))[1]
+
+
+# In[ ]:
+
+
+print(concat)
 
