@@ -212,8 +212,8 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/data_avg2882.npy")[()]
-classes_concat = np.load("database/data_concat2882.npy")[()]
+classes_avg = np.load("database/data_avg2981.npy")[()]
+classes_concat = np.load("database/data_concat2981.npy")[()]
 
 
 # In[ ]:
@@ -246,7 +246,7 @@ histo(dist_intra_concat, dist_extra_concat)
 
 
 cpt = 0
-for classe, protein_list in classes_avg2.items():
+for classe, protein_list in classes_avg.items():
     for protein_a, vec_a in protein_list.items():
         cpt += 1
 print(cpt)
@@ -255,14 +255,14 @@ print(cpt)
 # In[ ]:
 
 
-classes_avg2 = np.load("database/next_batch/data_avg100.npy")[()]
-classes_concat2 = np.load("database/next_batch/data_concat100.npy")[()]
+classes_avg2 = np.load("database/next_batch/data_avg1400.npy")[()]
+classes_concat2 = np.load("database/next_batch/data_concat1400.npy")[()]
 
 
 # In[ ]:
 
 
-del classes_avg2["a.138.1.2"]
+del classes_concat2["b.155.1.1"]
 
 
 # In[ ]:
@@ -275,12 +275,12 @@ classes_concat.update(classes_concat2)
 # In[ ]:
 
 
-np.save("database/data_avg2981.npy", classes_avg)
-np.save("database/data_concat2981.npy", classes_concat)
+np.save("database/data_avg4379.npy", classes_avg)
+np.save("database/data_concat4379.npy", classes_concat)
 
 
 # In[ ]:
 
 
-print(classes_concat["a.17.1.2"])
+print(classes_concat["b.154.1.1"])
 
