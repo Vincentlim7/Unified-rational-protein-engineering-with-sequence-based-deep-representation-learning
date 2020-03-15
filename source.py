@@ -212,8 +212,8 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/data_avg13124.npy")[()]
-classes_concat = np.load("database/data_concat13124.npy")[()]
+classes_avg = np.load("database/data_avg14017.npy")[()]
+classes_concat = np.load("database/data_concat14017.npy")[()]
 
 
 # In[ ]:
@@ -255,14 +255,14 @@ print(cpt)
 # In[ ]:
 
 
-classes_avg2 = np.load("database/next_batch/data_avg900.npy")[()]
-classes_concat2 = np.load("database/next_batch/data_concat900.npy")[()]
+classes_avg2 = np.load("database/next_batch/data_avg1100.npy")[()]
+classes_concat2 = np.load("database/next_batch/data_concat1100.npy")[()]
 
 
 # In[ ]:
 
 
-del classes_concat2["d.117.1.1"]
+del classes_avg2["e.19.1.1"]
 
 
 # In[ ]:
@@ -275,12 +275,12 @@ classes_concat.update(classes_concat2)
 # In[ ]:
 
 
-np.save("database/data_avg14017.npy", classes_avg)
-np.save("database/data_concat14017.npy", classes_concat)
+np.save("database/data_avg15114.npy", classes_avg)
+np.save("database/data_concat15114.npy", classes_concat)
 
 
 # In[ ]:
 
 
-print(classes_avg2["d.116.1.1"])
+print(classes_avg2["e.18.1.2"])
 
