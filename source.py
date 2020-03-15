@@ -246,7 +246,7 @@ histo(dist_intra_concat, dist_extra_concat)
 
 
 cpt = 0
-for classe, protein_list in classes_avg2.items():
+for classe, protein_list in classes_avg.items():
     for protein_a, vec_a in protein_list.items():
         cpt += 1
 print(cpt)
@@ -255,14 +255,14 @@ print(cpt)
 # In[ ]:
 
 
-classes_avg2 = np.load("database/next_batch/data_avg900.npy")[()]
-classes_concat2 = np.load("database/next_batch/data_concat900.npy")[()]
+classes_avg2 = np.load("database/next_batch/data_avg1100.npy")[()]
+classes_concat2 = np.load("database/next_batch/data_concat1100.npy")[()]
 
 
 # In[ ]:
 
 
-del classes_concat2["c.69.1.25"]
+del classes_avg2["d.52.3.1"]
 
 
 # In[ ]:
@@ -275,12 +275,12 @@ classes_concat.update(classes_concat2)
 # In[ ]:
 
 
-np.save("database/data_avg11329.npy", classes_avg)
-np.save("database/data_concat11329.npy", classes_concat)
+np.save("database/data_avg12426.npy", classes_avg)
+np.save("database/data_concat12426.npy", classes_concat)
 
 
 # In[ ]:
 
 
-print(classes_concat2["d.13.1.4"])
+print(classes_avg2["d.52.2.1"])
 
