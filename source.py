@@ -212,13 +212,6 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/avg/data_avg.npy")[()]
-classes_concat = np.load("database/concat/data_concat.npy")[()]
-
-
-# In[ ]:
-
-
 dist_intra_avg = get_dist_intra(classes_avg)
 dist_intra_concat = get_dist_intra(classes_concat)
 
@@ -228,6 +221,22 @@ dist_intra_concat = get_dist_intra(classes_concat)
 
 dist_extra_avg = get_dist_extra(classes_avg)
 dist_extra_concat = get_dist_extra(classes_concat)
+
+
+# In[ ]:
+
+
+classes_avg = np.load("database/avg/data_avg.npy")[()]
+dist_intra_avg = np.load("database/avg/dist_intra_avg.npy")[()]
+dist_extra_avg = np.load("database/avg/dist_extra_avg.npy")[()]
+
+
+# In[ ]:
+
+
+classes_concat = np.load("database/concat/data_concat.npy")[()]
+dist_intra_concat = np.load("database/concat/dist_intra_concat.npy")[()]
+dist_extra_concat = np.load("database/concat/dist_extra_concat.npy")[()]
 
 
 # In[ ]:
