@@ -131,10 +131,10 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
             elapsed_time = time.time() - start_time
             print(elapsed_time)
             start_time = time.time() # Reset timer
-            np.save("database/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
-            np.save("database/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
-    np.save("database/next_batch/data_avg.npy", classes_avg) # Saving whole database
-    np.save("database/next_batch/data_concat.npy", classes_concat)
+            np.save("database/avg/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
+            np.save("database/concat/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
+    np.save("database/avg/next_batch/data_avg.npy", classes_avg) # Saving whole database
+    np.save("database/concat/next_batch/data_concat.npy", classes_concat)
     return classes_avg, classes_concat
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
@@ -212,8 +212,8 @@ print(total_elapsed_time)
 # In[ ]:
 
 
-classes_avg = np.load("database/data_avg16312.npy")[()]
-classes_concat = np.load("database/data_concat16312.npy")[()]
+classes_avg = np.load("database/avg/data_avg.npy")[()]
+classes_concat = np.load("database/concat/data_concat.npy")[()]
 
 
 # In[ ]:
@@ -240,47 +240,4 @@ histo(dist_intra_avg, dist_extra_avg)
 
 
 histo(dist_intra_concat, dist_extra_concat)
-
-
-# In[ ]:
-
-
-cpt = 0
-for classe, protein_list in classes_avg2.items():
-    for protein_a, vec_a in protein_list.items():
-        cpt += 1
-print(cpt)
-
-
-# In[ ]:
-
-
-classes_avg2 = np.load("database/data_avg.npy")[()]
-classes_concat2 = np.load("database/next_batch/data_concat.npy")[()]
-
-
-# In[ ]:
-
-
-del classes_concat2["g.37.1.2"]
-
-
-# In[ ]:
-
-
-classes_avg.update(classes_avg2)
-classes_concat.update(classes_concat2)
-
-
-# In[ ]:
-
-
-np.save("database/data_avg.npy", classes_avg)
-np.save("database/data_concat.npy", classes_concat)
-
-
-# In[ ]:
-
-
-print(classes_avg2["g.88.1.1"])
 
