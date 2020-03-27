@@ -168,16 +168,17 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
                         dist_extra[classe_a][protein_a] = (protein_b, dist)
     return dist_extra
                     
-def histo(dist_intra, dist_extra):
+def histo(dist_intra, dist_extra, avg):
     x_intra = []
     y_intra = []
     x_extra = []
     y_extra = []
-
+    
+    # Retrieve datas
     for classe, protein_list in dist_intra.items(): # Retrieving smallest dist value in dist_intra for each protein
         classe_dist = np.inf
         for protein, val in protein_list.items():
-            if(val[1] < classe_dist):
+            if(val[1] < classe_dist):     # val = (protein, dist)
                 classe_dist = val[1]
         if(classe_dist != np.inf):
             x_intra.append(classe_dist)
@@ -191,6 +192,13 @@ def histo(dist_intra, dist_extra):
         if(classe_dist != np.inf):
             x_extra.append(classe_dist)
             y_extra.append(len(protein_list))
+    
+    # Plot histogram
+    if avg:
+        plt.title("Distance Euclidienne avec vecteurs avg")
+    else:
+        plt.title("Distance Euclidienne avec vecteurs concat")
+        plt.ylim(0, 150)            # Changing y-axis' scale
 
     plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
     plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
@@ -242,11 +250,11 @@ dist_extra_concat = np.load("database/concat/dist_extra_concat.npy")[()]
 # In[ ]:
 
 
-histo(dist_intra_avg, dist_extra_avg)
+histo(dist_intra_avg, dist_extra_avg, avg = True)
 
 
 # In[ ]:
 
 
-histo(dist_intra_concat, dist_extra_concat)
+histo(dist_intra_concat, dist_extra_concat, avg = False)
 
