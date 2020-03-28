@@ -196,13 +196,23 @@ def histo(dist_intra, dist_extra, avg):
     # Plot histogram
     if avg:
         plt.title("Distance Euclidienne avec vecteurs avg")
+        plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
+        plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
+        plt.xlim(0, 0.4)
     else:
         plt.title("Distance Euclidienne avec vecteurs concat")
-        plt.ylim(0, 150)            # Changing y-axis' scale
-
-    plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
-    plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
-    plt.xlabel('Distance')
+        plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.1, label='intra')
+        plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.1, label='extra')
+        plt.xlim(0, 10)
+    
+    
+    print("distance intra :")
+    print("\tmin :", min(x_intra))
+    print("\tmax :", max(x_intra))
+    print("distance extra :")
+    print("\tmin :", min(x_extra))
+    print("\tmax :", max(x_extra))
+    plt.xlabel('Distance euclidienne')
     plt.ylabel('Nb Sequence')
     plt.legend(loc='upper right')
     plt.show()
