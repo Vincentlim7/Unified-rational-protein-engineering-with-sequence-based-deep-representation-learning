@@ -139,6 +139,7 @@ def dic_init(): # Initializing nested dictionnaries all proteins and their vecto
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
     dist_intra = dict()
+    allDist = []
     for classe, protein_list in protein_dict.items():
         if classe not in dist_intra: # Adding new category key if it doesn't exist
             dist_intra[classe] = dict()
@@ -148,12 +149,14 @@ def get_dist_intra(protein_dict): # Initializing a dictionnary containning the s
                 if protein_a == protein_b:
                     continue
                 dist = distance.euclidean(vec_a, vec_b)
+                allDist.append(dist)
                 if dist < dist_intra[classe][protein_a][1]:
                     dist_intra[classe][protein_a] = (protein_b, dist)
-    return dist_intra
+    return dist_intra, (np.mean(allDist), np.std(allDist))
 
 def get_dist_extra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of different category
     dist_extra = dict()
+    allDist = []
     for classe_a, protein_list_a in protein_dict.items():
         if classe_a not in dist_extra: # Adding new category key if it doesn't exist
             dist_extra[classe_a] = dict()
@@ -164,15 +167,14 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
                     continue
                 for protein_b, vec_b in protein_list_b.items():
                     dist = distance.euclidean(vec_a, vec_b)
+                    allDist.append(dist)
                     if dist < dist_extra[classe_a][protein_a][1]:
                         dist_extra[classe_a][protein_a] = (protein_b, dist)
-    return dist_extra
+    return dist_extra, (np.mean(allDist), np.std(allDist))
                     
 def histo(dist_intra, dist_extra, avg):
     x_intra = []
-    y_intra = []
     x_extra = []
-    y_extra = []
     
     # Retrieve datas
     for classe, protein_list in dist_intra.items(): # Retrieving smallest dist value in dist_intra for each protein
@@ -182,7 +184,6 @@ def histo(dist_intra, dist_extra, avg):
                 classe_dist = val[1]
         if(classe_dist != np.inf):
             x_intra.append(classe_dist)
-            y_intra.append(len(protein_list))
 
     for classe, protein_list in dist_extra.items(): # Retrieving smallest dist value in dist_extra for each protein
         classe_dist = np.inf
@@ -191,19 +192,15 @@ def histo(dist_intra, dist_extra, avg):
                 classe_dist = val[1]
         if(classe_dist != np.inf):
             x_extra.append(classe_dist)
-            y_extra.append(len(protein_list))
     
     # Plot histogram
     if avg:
         plt.title("Distance Euclidienne avec vecteurs avg")
-        plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
-        plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
-        plt.xlim(0, 0.6)
+        plt.hist([x_intra, x_extra], bins=100, label=['intra', 'extra'])
+        
     else:
         plt.title("Distance Euclidienne avec vecteurs concat")
-        plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.1, label='intra')
-        plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.1, label='extra')
-        plt.xlim(0, 6)
+        plt.hist([x_intra, x_extra], bins=100, label=['intra', 'extra'])
     
     
     print("distance intra :")
@@ -243,6 +240,22 @@ dist_intra_concat = get_dist_intra(classes_concat)
 
 dist_extra_avg = get_dist_extra(classes_avg)
 dist_extra_concat = get_dist_extra(classes_concat)
+
+
+# In[ ]:
+
+
+_, stats_avg = get_dist_extra(classes_avg)
+_, stats_concat = get_dist_extra(classes_concat)
+print("avg", stats_avg)
+print("concat", stats_concat)
+
+
+# In[ ]:
+
+
+np.save("database/avg/stats_extra.npy", stats_avg)
+np.save("database/concat/stats_extra.npy", stats_concat)
 
 
 # In[ ]:
