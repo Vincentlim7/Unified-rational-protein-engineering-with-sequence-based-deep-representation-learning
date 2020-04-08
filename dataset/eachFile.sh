@@ -1,19 +1,14 @@
-#!/bin/bash
+filename='./test_dataset.list'
 
-filename='/home/david/Documents/juliaProjet/optimiseSearchProtDB/dataset/test_dataset.list_family.complete'
+filename2='./fastas'
 
+declare -a file_array_test
 
-cpt=0
+declare -a file_array_fastas
+
 while read -r line
 do
-	#Take the 7 first letter of each line and put the result in id variable
-	id=$(cut -c-7 <<< "$line")
-	#Execute the makeblastdb command
-	makeblastdb -in /home/david/Documents/GitProjet/LU3IN013_Projet_Source/dataset/fastas/$id.fasta -out d1a0aa_.db -dbtype prot
- 	#code for passing id to other script file as parameter
-  	cpt=$((cpt+1))
-done < "$filename" #Passing the argument for the while loop
-
-
-
-
+  #Take the 7 first letter of each line
+  id=$(cut -c-7 <<< "$line")
+  makeblastdb -in ./fastas/$id.fasta -out ./testFiles/$id.db -dbtype prot
+done < "$filename"
