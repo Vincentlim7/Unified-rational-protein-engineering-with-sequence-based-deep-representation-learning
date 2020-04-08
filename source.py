@@ -178,20 +178,14 @@ def histo(dist_intra, dist_extra, avg):
     
     # Retrieve datas
     for classe, protein_list in dist_intra.items(): # Retrieving smallest dist value in dist_intra for each protein
-        classe_dist = np.inf
         for protein, val in protein_list.items():
-            if(val[1] < classe_dist):     # val = (protein, dist)
-                classe_dist = val[1]
-        if(classe_dist != np.inf):
-            x_intra.append(classe_dist)
+            if(val[1] != np.inf):     # val = (protein, dist)
+                x_intra.append(val[1])
 
     for classe, protein_list in dist_extra.items(): # Retrieving smallest dist value in dist_extra for each protein
-        classe_dist = np.inf
         for protein, val in protein_list.items():
-            if(val[1] < classe_dist):
-                classe_dist = val[1]
-        if(classe_dist != np.inf):
-            x_extra.append(classe_dist)
+            if(val[1] != np.inf):     # val = (protein, dist)
+                x_extra.append(val[1])
     
     # Plot histogram
     if avg:
@@ -254,24 +248,54 @@ print("concat", stats_concat)
 # In[ ]:
 
 
-np.save("database/avg/stats_extra.npy", stats_avg)
-np.save("database/concat/stats_extra.npy", stats_concat)
+np.save("dataset/avg/stats_extra.npy", stats_avg)
+np.save("dataset/concat/stats_extra.npy", stats_concat)
 
 
 # In[ ]:
 
 
-classes_avg = np.load("database/avg/data_avg.npy")[()]
-dist_intra_avg = np.load("database/avg/dist_intra_avg.npy")[()]
-dist_extra_avg = np.load("database/avg/dist_extra_avg.npy")[()]
+classes_avg = np.load("dataset/avg/data_avg.npy")[()]
+dist_intra_avg = np.load("dataset/avg/dist_intra_avg.npy")[()]
+dist_extra_avg = np.load("dataset/avg/dist_extra_avg.npy")[()]
 
 
 # In[ ]:
 
 
-classes_concat = np.load("database/concat/data_concat.npy")[()]
-dist_intra_concat = np.load("database/concat/dist_intra_concat.npy")[()]
-dist_extra_concat = np.load("database/concat/dist_extra_concat.npy")[()]
+classes_concat = np.load("dataset/concat/data_concat.npy")[()]
+dist_intra_concat = np.load("dataset/concat/dist_intra_concat.npy")[()]
+dist_extra_concat = np.load("dataset/concat/dist_extra_concat.npy")[()]
+
+
+# In[ ]:
+
+
+print(dist_intra_avg["a.1.1.1"])
+print(dist_extra_avg["a.1.1.1"])
+
+
+# In[ ]:
+
+
+prot_seq1 = get_prot_seq("d1dlya_", 1)
+avg1, concat1 = get_vecs(prot_seq1, 1)
+
+print("TOUTES LES DISTANCES INTRA DE d1dlya_\n")
+for protein, avg2 in classes_avg["a.1.1.1"].items():
+    if protein == "d1dlya_":
+        continue
+    print(protein)
+    print(distance.euclidean(avg1, avg2))
+    
+print()
+
+print("LA DIST EXTRA MIN DE d1dlya_\n")
+prot_seq3 = get_prot_seq("d1jh3a_", 1)
+avg3, concat3 = get_vecs(prot_seq3, 1)
+
+print("d1jh3a_")
+print(distance.euclidean(avg1, avg3))
 
 
 # In[ ]:
@@ -284,4 +308,24 @@ histo(dist_intra_avg, dist_extra_avg, avg = True)
 
 
 histo(dist_intra_concat, dist_extra_concat, avg = False)
+
+
+# In[ ]:
+
+
+f = open("dataset/testFiles/d1a0ca_.db.phr", "r") # Retriving the file containing the sequence
+next(f) # Skipping the first line (containing the protein's name)
+seq = ""
+for line in f: # Retriving the sequence
+    tmp = line.rstrip()    # Deleting "\n"
+    seq += tmp
+    print(seq)
+f.close
+
+
+# In[ ]:
+
+
+test= np.load("dataset/testFiles/d1a0ca_.db.phr")
+print(test)
 
