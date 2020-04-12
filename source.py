@@ -309,23 +309,3 @@ histo(dist_intra_avg, dist_extra_avg, avg = True)
 
 histo(dist_intra_concat, dist_extra_concat, avg = False)
 
-
-# In[ ]:
-
-
-f = open("dataset/testFiles/d1a0ca_.db.phr", "r") # Retriving the file containing the sequence
-next(f) # Skipping the first line (containing the protein's name)
-seq = ""
-for line in f: # Retriving the sequence
-    tmp = line.rstrip()    # Deleting "\n"
-    seq += tmp
-    print(seq)
-f.close
-
-
-# In[ ]:
-
-
-test= np.load("dataset/testFiles/d1a0ca_.db.phr")
-print(test)
-
