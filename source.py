@@ -22,6 +22,7 @@ import tensorflow as tf
 import numpy as np
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
+import time
 
 # Set seeds
 tf.set_random_seed(42)
@@ -62,28 +63,44 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 # In[ ]:
 
 
-def get_prot_seq(file_name):
-    f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
-    next(f) # Skipping the first line (containing the protein's name)
-    seq = ""
-    for line in f: # Retriving the sequence
-        tmp = line.rstrip()    # Deleting "\n"
-        seq += tmp
-    f.close
-    print("lecture fichier")
+def get_prot_seq(file_name, cpt):
+    if cpt % 30 == 0:
+        print("protein n°", cpt)
+        lecture_start_time = time.time()
+        f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
+        next(f) # Skipping the first line (containing the protein's name)
+        seq = ""
+        for line in f: # Retriving the sequence
+            tmp = line.rstrip()    # Deleting "\n"
+            seq += tmp
+        f.close
+        lecture_elapsed_time = time.time() - lecture_start_time
+        print("Temps lecture fichier : ", lecture_elapsed_time)
+    else:
+        f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
+        next(f) # Skipping the first line (containing the protein's name)
+        seq = ""
+        for line in f: # Retriving the sequence
+            tmp = line.rstrip()    # Deleting "\n"
+            seq += tmp
+        f.close
+    
     return seq
 
-def get_avg_vec(seq):
-    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
-    print("calcul vecteur")
-    return avg_vec
-
-def get_concat_vec(seq):
-    avg_vec = b.get_rep(seq)[0] # Vector 1 : avg
-    fnl_hid_vec = b.get_rep(seq)[1] # Vector 2 : final hidden
-    fnl_cell_vec = b.get_rep(seq)[2] # Vector 3 : final cell
-    seq_vec = np.concatenate((avg_vec, fnl_hid_vec, fnl_cell_vec)) # Concatenation of all three vectors
-    return seq_vec
+def get_vecs(seq, cpt):
+    if cpt % 30 == 0:
+        vecs_start_time = time.time()
+        vecs = b.get_rep(seq)
+        avg_vec = vecs[0]
+        concat_vec = np.reshape(vecs, 192) # Concatenation of all three vectors
+        vecs_elapsed_time = time.time() - vecs_start_time
+        print("Temps vecs : ", vecs_elapsed_time)
+    
+    else:
+        vecs = b.get_rep(seq)
+        avg_vec = vecs[0]
+        concat_vec = np.reshape(vecs, 192) # Concatenation of all three vectors
+    return avg_vec, concat_vec
 
 def get_classe(searched_protein): # Returning the protein's category (the key in the level 0 dictionnary)
     for classe, protein_list in classes.items(): # Browsing the category dictionnary (level 0)
@@ -92,23 +109,37 @@ def get_classe(searched_protein): # Returning the protein's category (the key in
                 return classe
 
 
-def dic_init(avg = True): # Initializing the nested dictionnary containing all proteins and their vector (avg or concatenated)
-    classes = dict()
+def dic_init(): # Initializing nested dictionnaries all proteins and their vector (avg or concatenated)
+    classes_avg = dict()
+    classes_concat = dict()
     f = open("partialProtein.list", "r")
+    cpt = 0 # Number of protein already processed
+    start_time = time.time()
     for line in f: # Browsing all protein
         infos = line.split()
         protein = infos[0]    # Protein name
         classe = infos[1]     # Protein category
-        if classe not in classes: # Adding new category key if it doesn't exist
-            classes[classe] = dict()
-        if avg: # adding the avg or concatenated vector
-            classes[classe][protein] = get_avg_vec(get_prot_seq(protein))
-        else:
-            classes[classe][protein] = get_concat_vec(get_prot_seq(protein))
-    return classes
+        if classe not in classes_avg: # Adding new category key if it doesn't exist
+            classes_avg[classe] = dict()
+        if classe not in classes_concat: # Adding new category key if it doesn't exist
+            classes_concat[classe] = dict()
+        prot_seq = get_prot_seq(protein, cpt) # Retrieving protein sequence
+        classes_avg[classe][protein], classes_concat[classe][protein] = get_vecs(prot_seq, cpt) # Retrieving and stocking vectors
+        cpt += 1
+        if cpt % 100 == 0: # Periodical save every 100 protein processed
+            print("Nombre proteines lues : ", cpt)
+            elapsed_time = time.time() - start_time
+            print(elapsed_time)
+            start_time = time.time() # Reset timer
+            np.save("database/avg/next_batch/data_avg" + str(cpt) + ".npy", classes_avg)
+            np.save("database/concat/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
+    np.save("database/avg/next_batch/data_avg.npy", classes_avg) # Saving whole database
+    np.save("database/concat/next_batch/data_concat.npy", classes_concat)
+    return classes_avg, classes_concat
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
     dist_intra = dict()
+    allDist = []
     for classe, protein_list in protein_dict.items():
         if classe not in dist_intra: # Adding new category key if it doesn't exist
             dist_intra[classe] = dict()
@@ -118,12 +149,14 @@ def get_dist_intra(protein_dict): # Initializing a dictionnary containning the s
                 if protein_a == protein_b:
                     continue
                 dist = distance.euclidean(vec_a, vec_b)
+                allDist.append(dist)
                 if dist < dist_intra[classe][protein_a][1]:
                     dist_intra[classe][protein_a] = (protein_b, dist)
-    return dist_intra
+    return dist_intra, (np.mean(allDist), np.std(allDist))
 
 def get_dist_extra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of different category
     dist_extra = dict()
+    allDist = []
     for classe_a, protein_list_a in protein_dict.items():
         if classe_a not in dist_extra: # Adding new category key if it doesn't exist
             dist_extra[classe_a] = dict()
@@ -134,65 +167,145 @@ def get_dist_extra(protein_dict): # Initializing a dictionnary containning the s
                     continue
                 for protein_b, vec_b in protein_list_b.items():
                     dist = distance.euclidean(vec_a, vec_b)
+                    allDist.append(dist)
                     if dist < dist_extra[classe_a][protein_a][1]:
                         dist_extra[classe_a][protein_a] = (protein_b, dist)
-    return dist_extra
+    return dist_extra, (np.mean(allDist), np.std(allDist))
                     
-def histo(dist_intra, dist_extra):
+def histo(dist_intra, dist_extra, avg):
     x_intra = []
-    y_intra = []
     x_extra = []
-    y_extra = []
-
+    
+    # Retrieve datas
     for classe, protein_list in dist_intra.items(): # Retrieving smallest dist value in dist_intra for each protein
-        classe_dist = np.inf
         for protein, val in protein_list.items():
-            if(val[1] < classe_dist):
-                classe_dist = val[1]
-        if(classe_dist != np.inf):
-            x_intra.append(classe_dist)
-            y_intra.append(len(protein_list))
+            if(val[1] != np.inf):     # val = (protein, dist)
+                x_intra.append(val[1])
 
     for classe, protein_list in dist_extra.items(): # Retrieving smallest dist value in dist_extra for each protein
-        classe_dist = np.inf
         for protein, val in protein_list.items():
-            if(val[1] < classe_dist):
-                classe_dist = val[1]
-        if(classe_dist != np.inf):
-            x_extra.append(classe_dist)
-            y_extra.append(len(protein_list))
-
-    plt.bar(x_intra,y_intra,align='center', alpha = 0.7, width = 0.01, label='intra')
-    plt.bar(x_extra,y_extra,align='center', alpha = 0.7, width = 0.01, label='extra')
-    plt.xlabel('Distance')
+            if(val[1] != np.inf):     # val = (protein, dist)
+                x_extra.append(val[1])
+    
+    # Plot histogram
+    if avg:
+        plt.title("Distance Euclidienne avec vecteurs avg")
+        plt.hist([x_intra, x_extra], bins=100, label=['intra', 'extra'])
+        
+    else:
+        plt.title("Distance Euclidienne avec vecteurs concat")
+        plt.hist([x_intra, x_extra], bins=100, label=['intra', 'extra'])
+    
+    
+    print("distance intra :")
+    print("\tmin :", min(x_intra))
+    print("\tmax :", max(x_intra))
+    print("\tmoyenne :", np.mean(x_intra))
+    print("\tecart-type :", np.std(x_intra))
+    print("distance extra :")
+    print("\tmin :", min(x_extra))
+    print("\tmax :", max(x_extra))
+    print("\tmoyenne :", np.mean(x_extra))
+    print("\tecart-type :", np.std(x_extra))
+    plt.xlabel('Distance euclidienne')
     plt.ylabel('Nb Sequence')
     plt.legend(loc='upper right')
-    plt.show() 
+    plt.show()
 
 
 # In[ ]:
 
 
-classes = dic_init()
-print(classes)
+total_start_time = time.time()
+classes_avg, classes_concat = dic_init()
+total_elapsed_time = time.time() - total_start_time
+print(total_elapsed_time)
 
 
 # In[ ]:
 
 
-dist_intra = get_dist_intra(classes)
-print(dist_intra)
+dist_intra_avg = get_dist_intra(classes_avg)
+dist_intra_concat = get_dist_intra(classes_concat)
 
 
 # In[ ]:
 
 
-dist_extra = get_dist_extra(classes)
-print(dist_extra)
+dist_extra_avg = get_dist_extra(classes_avg)
+dist_extra_concat = get_dist_extra(classes_concat)
 
 
 # In[ ]:
 
 
-histo(dist_intra, dist_extra)
+_, stats_avg = get_dist_extra(classes_avg)
+_, stats_concat = get_dist_extra(classes_concat)
+print("avg", stats_avg)
+print("concat", stats_concat)
+
+
+# In[ ]:
+
+
+np.save("dataset/avg/stats_extra.npy", stats_avg)
+np.save("dataset/concat/stats_extra.npy", stats_concat)
+
+
+# In[ ]:
+
+
+classes_avg = np.load("dataset/avg/data_avg.npy")[()]
+dist_intra_avg = np.load("dataset/avg/dist_intra_avg.npy")[()]
+dist_extra_avg = np.load("dataset/avg/dist_extra_avg.npy")[()]
+
+
+# In[ ]:
+
+
+classes_concat = np.load("dataset/concat/data_concat.npy")[()]
+dist_intra_concat = np.load("dataset/concat/dist_intra_concat.npy")[()]
+dist_extra_concat = np.load("dataset/concat/dist_extra_concat.npy")[()]
+
+
+# In[ ]:
+
+
+print(dist_intra_avg["a.1.1.1"])
+print(dist_extra_avg["a.1.1.1"])
+
+
+# In[ ]:
+
+
+prot_seq1 = get_prot_seq("d1dlya_", 1)
+avg1, concat1 = get_vecs(prot_seq1, 1)
+
+print("TOUTES LES DISTANCES INTRA DE d1dlya_\n")
+for protein, avg2 in classes_avg["a.1.1.1"].items():
+    if protein == "d1dlya_":
+        continue
+    print(protein)
+    print(distance.euclidean(avg1, avg2))
+    
+print()
+
+print("LA DIST EXTRA MIN DE d1dlya_\n")
+prot_seq3 = get_prot_seq("d1jh3a_", 1)
+avg3, concat3 = get_vecs(prot_seq3, 1)
+
+print("d1jh3a_")
+print(distance.euclidean(avg1, avg3))
+
+
+# In[ ]:
+
+
+histo(dist_intra_avg, dist_extra_avg, avg = True)
+
+
+# In[ ]:
+
+
+histo(dist_intra_concat, dist_extra_concat, avg = False)
 
