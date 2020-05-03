@@ -7,7 +7,7 @@
 
 # Use the 64-unit or the 1900-unit model?
 
-# In[ ]:
+# In[1]:
 
 
 USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 64 dimensional one.
@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[ ]:
+# In[2]:
 
 
 # to allow autoreload of utils.py
@@ -55,7 +55,7 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[ ]:
+# In[3]:
 
 
 batch_size = 12
@@ -71,80 +71,92 @@ b = babbler(batch_size=batch_size, model_path=MODEL_WEIGHT_PATH)
 
 
 total_start_time = time.time()
-classes_avg, classes_concat = dic_init()
+classes_avg, classes_concat = utils.dic_init()
 total_elapsed_time = time.time() - total_start_time
 print(total_elapsed_time)
 np.save("dataset/avg/data_avg.npy", classes_avg)
 np.save("dataset/concat/data_concat.npy", classes_concat)
 
-dist_intra_avg = get_dist_intra(classes_avg)
-dist_intra_concat = get_dist_intra(classes_concat)
+dist_intra_avg, stats_intra_avg = utils.get_dist_intra(classes_avg)
+dist_intra_concat, stats_intra_concat = utils.get_dist_intra(classes_concat)
 np.save("dataset/avg/dist_intra_avg.npy", dist_intra_avg)
 np.save("dataset/concat/dist_intra_concat.npy", dist_intra_concat)
-
-dist_extra_avg = get_dist_extra(classes_avg)
-dist_extra_concat = get_dist_extra(classes_concat)
-np.save("dataset/avg/dist_extra_avg.npy", dist_extra_avg)
-np.save("dataset/concat/dist_extra_concat.npy", dist_extra_concat)
-
-_, stats_intra_avg = get_dist_extra(classes_avg)
-_, stats_intra_concat = get_dist_extra(classes_concat)
 np.save("dataset/avg/stats_intra.npy", stats_intra_avg)
 np.save("dataset/concat/stats_intra.npy", stats_intra_concat)
 
-_, stats_extra_avg = get_dist_extra(classes_avg)
-_, stats_extra_concat = get_dist_extra(classes_concat)
+dist_extra_avg, stats_extra_avg = utils.get_dist_extra(classes_avg)
+dist_extra_concat, stats_extra_concat = utils.get_dist_extra(classes_concat)
+np.save("dataset/avg/dist_extra_avg.npy", dist_extra_avg)
+np.save("dataset/concat/dist_extra_concat.npy", dist_extra_concat)
 np.save("dataset/avg/stats_extra.npy", stats_extra_avg)
 np.save("dataset/concat/stats_extra.npy", stats_extra_concat)
+
+utils.seuil_init()
 
 
 # Load data with numpy.load("path to binary file containing data")
 
-# In[ ]:
+# In[4]:
 
 
 classes_avg = np.load("dataset/avg/data_avg.npy")[()]
 dist_intra_avg = np.load("dataset/avg/dist_intra_avg.npy")[()]
 dist_extra_avg = np.load("dataset/avg/dist_extra_avg.npy")[()]
+stat_intra_avg = np.load("dataset/avg/stats_intra.npy")
+seuil_avg = np.load("dataset/avg/seuil.npy")[()]
+stat_extra_avg = np.load("dataset/avg/stats_extra.npy")
 
 classes_concat = np.load("dataset/concat/data_concat.npy")[()]
 dist_intra_concat = np.load("dataset/concat/dist_intra_concat.npy")[()]
 dist_extra_concat = np.load("dataset/concat/dist_extra_concat.npy")[()]
-
-
-# In[ ]:
-
-
-stat_intra_avg = np.load("dataset/avg/stats_intra.npy")
 stat_intra_concat = np.load("dataset/concat/stats_intra.npy")
-
-stat_extra_avg = np.load("dataset/avg/stats_extra.npy")
 stat_extra_concat = np.load("dataset/concat/stats_extra.npy")
 
 
-# In[ ]:
-
-
-print(stat_intra_avg)
-print(stat_extra_avg)
-print(stat_intra_concat)
-print(stat_extra_concat)
-
-
-# In[ ]:
+# In[7]:
 
 
 utils.histo(dist_intra_avg, dist_extra_avg, avg = True)
 
 
-# In[ ]:
+# In[8]:
 
 
 utils.histo(dist_intra_concat, dist_extra_concat, avg = False)
 
 
-# In[ ]:
+# In[41]:
 
 
-utils.test()
+res = np.inf
+for distance in dist_intra_avg["a.1.1.1"].values():
+    print(distance[1])
+    if distance[1] < res:
+        res = distance[1]
+print(res)
+print("-----------")
+seuil_intra = np.inf
+for protein, distance in dist_intra_avg["a.1.1.1"].values():
+    print(distance)
+    if distance < seuil_intra:
+        seuil_intra = distance
+print(seuil_intra)
+
+
+# In[44]:
+
+
+utils.seuil_init()
+
+
+# In[46]:
+
+
+seuil = np.load("dataset/avg/seuil.npy")[()]
+
+
+# In[56]:
+
+
+utils.test2()
 

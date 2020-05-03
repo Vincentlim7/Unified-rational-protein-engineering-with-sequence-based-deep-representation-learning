@@ -61,6 +61,7 @@ def dic_init(b): # Initializing nested dictionnaries all proteins and their vect
             np.save("database/concat/next_batch/data_concat" + str(cpt) + ".npy", classes_concat)
     np.save("database/avg/next_batch/data_avg.npy", classes_avg) # Saving whole database
     np.save("database/concat/next_batch/data_concat.npy", classes_concat)
+    f.close
     return classes_avg, classes_concat
 
 def get_dist_intra(protein_dict): # Initializing a dictionnary containning the shortest euclidian distance between proteins of the same category
@@ -137,3 +138,37 @@ def histo(dist_intra, dist_extra, avg):
     plt.ylabel('Nb Sequence')
     plt.legend(loc='upper right')
     plt.show()
+
+
+def seuil_init():
+    dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
+    dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
+    seuil = dict()
+    for classe, dist_lis in dist_intra.items():
+        min_intra = np.inf
+        min_extra = np.inf
+        for protein, distance in dist_intra[classe].values():
+            if distance < min_intra:
+                min_intra = distance
+        for protein, distance in dist_extra[classe].values():
+            if distance < min_extra:
+                min_extra = distance
+        seuil[classe] = min(min_intra, min_extra)
+    np.save("dataset/avg/seuil.npy", seuil)
+
+
+# dict 1 classe --> dict 2
+# dict 2 protein --> vecteur
+def psiblastCode(classe_dict):
+    f = open("./dataset/test_dataset.list", "r")
+    for line in f: # Retriving the sequence
+        protein = line.split()
+        print(tmp[0])
+        
+    f.close
+
+def test2():
+    var = 1
+    path = "dataset/avg/test"+str(var)+".npy"
+    print(type(path))
+    np.save(path, var)
