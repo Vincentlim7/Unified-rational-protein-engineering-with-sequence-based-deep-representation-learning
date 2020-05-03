@@ -5,11 +5,6 @@ import time
 import subprocess
 import os
 
-def test():
-    print("hello")
-    # subprocess.call(['./randomScript.sh'])
-    os.system('bash randomScript.sh')
-    print("nye")
     
 def get_prot_seq(file_name):
     f = open("dataset/fastas/" + file_name + ".fasta", "r") # Retriving the file containing the sequence
@@ -159,16 +154,58 @@ def seuil_init():
 
 # dict 1 classe --> dict 2
 # dict 2 protein --> vecteur
-def psiblastCode(classe_dict):
-    f = open("./dataset/test_dataset.list", "r")
-    for line in f: # Retriving the sequence
-        protein = line.split()
-        print(tmp[0])
-        
-    f.close
+def psiblastCode(classe_dict, seuil_avg):
+    test_dataset = open("./dataset/test_dataset.list", "r")
+    for test_line in test_dataset: # Retriving the sequence
+        test_prot = test_line.split()
+        test_prot_name = test_prot[0]
+        test_prot_class = test_prot[1]
+
+        os.system('touch dataset/psiblast_res/'+test_prot_name+'')
+
+        valid_class = None      # Used to skip unneeded comparison
+        train_dataset = open("./dataset/train_dataset.list", "r")
+        for train_line in train_dataset:
+            train_prot = train_line.split()
+            train_prot_name = train_prot[0]
+            train_prot_class = train_prot[1]
+            if valid_class == train_prot_class:
+                continue
+            dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
+
+            if dist < seuil_avg[train_prot_class]:
+                valid_class = train_prot_class
+                
+                os.system('bash scripts/randomScript.sh')
+
+
+
+        train_dataset.close
+
+
+    test_dataset.close
+
+
+def test():
+    print("hello")
+    # subprocess.call(['./randomScript.sh'])
+    os.system('bash randomScript.sh')
+    print("nye")
 
 def test2():
     var = 1
     path = "dataset/avg/test"+str(var)+".npy"
     print(type(path))
     np.save(path, var)
+
+def test3():
+    f = open("./dataset/d/res/d1h12a__res")
+    cpt = 0
+    for line in f:
+        cpt += 1
+    print(cpt)
+    cpt2 = 0
+    for line in f:
+        cpt2 += 1
+    print(cpt2)
+    f.close

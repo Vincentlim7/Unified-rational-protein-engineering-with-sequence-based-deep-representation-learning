@@ -7,7 +7,7 @@
 
 # Use the 64-unit or the 1900-unit model?
 
-# In[1]:
+# In[ ]:
 
 
 USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 64 dimensional one.
@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[2]:
+# In[ ]:
 
 
 # to allow autoreload of utils.py
@@ -55,7 +55,7 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[3]:
+# In[ ]:
 
 
 batch_size = 12
@@ -96,7 +96,7 @@ utils.seuil_init()
 
 # Load data with numpy.load("path to binary file containing data")
 
-# In[4]:
+# In[ ]:
 
 
 classes_avg = np.load("dataset/avg/data_avg.npy")[()]
@@ -113,19 +113,19 @@ stat_intra_concat = np.load("dataset/concat/stats_intra.npy")
 stat_extra_concat = np.load("dataset/concat/stats_extra.npy")
 
 
-# In[7]:
+# In[ ]:
 
 
 utils.histo(dist_intra_avg, dist_extra_avg, avg = True)
 
 
-# In[8]:
+# In[ ]:
 
 
 utils.histo(dist_intra_concat, dist_extra_concat, avg = False)
 
 
-# In[41]:
+# In[ ]:
 
 
 res = np.inf
@@ -143,20 +143,20 @@ for protein, distance in dist_intra_avg["a.1.1.1"].values():
 print(seuil_intra)
 
 
-# In[44]:
+# In[ ]:
 
 
 utils.seuil_init()
 
 
-# In[46]:
+# In[ ]:
 
 
 seuil = np.load("dataset/avg/seuil.npy")[()]
 
 
-# In[56]:
+# In[ ]:
 
 
-utils.test2()
+utils.test3()
 
