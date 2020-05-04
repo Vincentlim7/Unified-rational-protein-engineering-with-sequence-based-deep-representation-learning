@@ -152,17 +152,17 @@ utils.seuil_init()
 # In[ ]:
 
 
-seuil = np.load("dataset/avg/seuil.npy")[()]
+utils.psiblastCode(classes_avg, seuil_avg)
 
 
 # In[ ]:
 
 
-utils.test3()
+print("INTRA")
+for key, val in dist_intra_avg["a.102.4.2"].items():
+    print(val[1])
 
-
-# In[ ]:
-
-
-utils.test4()
+print("EXTRA")
+for key, val in dist_extra_avg["a.102.4.2"].items():
+    print(val[1])
 
