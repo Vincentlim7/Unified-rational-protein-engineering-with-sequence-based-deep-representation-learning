@@ -162,27 +162,24 @@ def psiblastCode(classe_dict, seuil_avg):
         test_prot_class = test_prot[1]
 
         os.system('touch dataset/psiblast_res/'+test_prot_name+'')
-
         valid_class = None      # Used to skip unneeded comparison
         train_dataset = open("./dataset/train_dataset.list", "r")
+
         for train_line in train_dataset:
             train_prot = train_line.split()
             train_prot_name = train_prot[0]
             train_prot_class = train_prot[1]
-            if valid_class == train_prot_class:
-                continue
-            dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
 
+            if train_prot_class == valid_class:
+                os.system('bash scripts/psiblastScript.sh ' + test_prot_name + ' ' + train_prot_name)
+                continue
+            
+            dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
             if dist < seuil_avg[train_prot_class]:
                 valid_class = train_prot_class
-                
-                os.system('bash scripts/randomScript.sh')
-
-
+                os.system('bash scripts/psiblastScript.sh ' + test_prot_name + ' ' + train_prot_name)
 
         train_dataset.close
-
-
     test_dataset.close
 
 
@@ -209,3 +206,8 @@ def test3():
         cpt2 += 1
     print(cpt2)
     f.close
+
+def test4():
+    x="d1h12a_"
+    y="d1h12a_"
+    os.system('bash scripts/psiblastScript.sh ' + x + ' ' + y)

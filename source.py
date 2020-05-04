@@ -160,3 +160,9 @@ seuil = np.load("dataset/avg/seuil.npy")[()]
 
 utils.test3()
 
+
+# In[ ]:
+
+
+utils.test4()
+
