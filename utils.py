@@ -161,8 +161,9 @@ def psiblastCode(classe_dict, seuil_avg):
         test_prot_name = test_prot[0]
         test_prot_class = test_prot[1]
 
-        os.system('touch dataset/psiblast_res/'+test_prot_name+'')
+        # os.system('touch dataset/psiblast_res/'+test_prot_name+'') # Pas besoin normalement car psiblastScript cree le fichier
         valid_class = None      # Used to skip unneeded comparison
+        previous_class = None   # Used to check if a family is never under the threshold
         train_dataset = open("./dataset/train_dataset.list", "r")
 
         for train_line in train_dataset:
@@ -171,13 +172,13 @@ def psiblastCode(classe_dict, seuil_avg):
             train_prot_class = train_prot[1]
 
             if train_prot_class == valid_class:
-                os.system('bash scripts/psiblastScript.sh ' + test_prot_name + ' ' + train_prot_name)
+                os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
                 continue
             
             dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
             if dist < seuil_avg[train_prot_class]:
-                valid_class = train_prot_class
-                os.system('bash scripts/psiblastScript.sh ' + test_prot_name + ' ' + train_prot_name)
+                valid_class = train_prot_class # Current examined class is approved for psiblast 
+                os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
 
         train_dataset.close
     test_dataset.close
