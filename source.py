@@ -104,6 +104,7 @@ dist_intra_avg = np.load("dataset/avg/dist_intra_avg.npy")[()]
 dist_extra_avg = np.load("dataset/avg/dist_extra_avg.npy")[()]
 stat_intra_avg = np.load("dataset/avg/stats_intra.npy")
 seuil_avg = np.load("dataset/avg/seuil.npy")[()]
+seuil_avg2 = np.load("dataset/avg/seuil2.npy")[()]
 stat_extra_avg = np.load("dataset/avg/stats_extra.npy")
 
 classes_concat = np.load("dataset/concat/data_concat.npy")[()]
@@ -152,17 +153,29 @@ utils.seuil_init()
 # In[ ]:
 
 
-utils.psiblastCode(classes_avg, seuil_avg)
+utils.seuil_init2()
+
+
+# In[ ]:
+
+
+utils.psiblastCode(classes_avg, seuil_avg2)
 
 
 # In[ ]:
 
 
 print("INTRA")
-for key, val in dist_intra_avg["a.102.4.2"].items():
-    print(val[1])
+x = 0
+for key, val in dist_intra_avg["c.1.8.3"].items():
+    if val[1] > x:
+        x = val[1]
+print(x)
 
 print("EXTRA")
-for key, val in dist_extra_avg["a.102.4.2"].items():
-    print(val[1])
+y = 0
+for key, val in dist_extra_avg["c.1.8.3"].items():
+    if val[1] > y:
+        y = val[1]
+print(y)
 

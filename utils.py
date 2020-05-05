@@ -2,7 +2,6 @@ import numpy as np
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import time
-import subprocess
 import os
 
     
@@ -151,6 +150,22 @@ def seuil_init():
         seuil[classe] = min(min_intra, min_extra)
     np.save("dataset/avg/seuil.npy", seuil)
 
+def seuil_init2():
+    dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
+    dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
+    seuil = dict()
+    for classe, dist_lis in dist_intra.items():
+        max_intra = 0
+        max_extra = 0
+        for protein, distance in dist_intra[classe].values():
+            if distance > max_intra:
+                max_intra = distance
+        for protein, distance in dist_extra[classe].values():
+            if distance > max_extra:
+                max_extra = distance
+        seuil[classe] = min(max_intra, max_extra)
+    np.save("dataset/avg/seuil2.npy", seuil)
+
 
 # dict 1 classe --> dict 2
 # dict 2 protein --> vecteur
@@ -204,33 +219,3 @@ def psiblastCode(classe_dict, seuil_avg):
     print("Nombre de famille ignorees : ", cpt)
     print("test_cpt : ", test_cpt)
     np.save("dataset/psiblast_res/comp_gain.npy", cpt)
-
-
-def test():
-    print("hello")
-    # subprocess.call(['./randomScript.sh'])
-    os.system('bash randomScript.sh')
-    print("nye")
-
-def test2():
-    var = 1
-    path = "dataset/avg/test"+str(var)+".npy"
-    print(type(path))
-    np.save(path, var)
-
-def test3():
-    f = open("./dataset/d/res/d1h12a__res")
-    cpt = 0
-    for line in f:
-        cpt += 1
-    print(cpt)
-    cpt2 = 0
-    for line in f:
-        cpt2 += 1
-    print(cpt2)
-    f.close
-
-def test4():
-    x="d1h12a_"
-    y="d1h12a_"
-    os.system('bash scripts/psiblastScript.sh ' + x + ' ' + y)
