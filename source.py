@@ -167,15 +167,18 @@ utils.psiblastCode(classes_avg, seuil_avg2)
 
 print("INTRA")
 x = 0
-for key, val in dist_intra_avg["c.1.8.3"].items():
+print(dist_intra_avg["a.104.1.1"])
+for key, val in dist_intra_avg["a.104.1.1"].items():
+    print(val[1])
     if val[1] > x:
         x = val[1]
-print(x)
+print("max :", x)
 
 print("EXTRA")
 y = 0
-for key, val in dist_extra_avg["c.1.8.3"].items():
+for key, val in dist_extra_avg["a.104.1.1"].items():
+    print(val[1])
     if val[1] > y:
         y = val[1]
-print(y)
+print("max :",y)
 
