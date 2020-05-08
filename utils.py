@@ -134,7 +134,7 @@ def histo(dist_intra, dist_extra, avg):
     plt.show()
 
 
-def seuil_init():
+def seuil_init(): # min(min_intra, min_extra)
     dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
     dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
     seuil = dict()
@@ -150,7 +150,7 @@ def seuil_init():
         seuil[classe] = min(min_intra, min_extra)
     np.save("dataset/avg/seuil.npy", seuil)
 
-def seuil_init2():
+def seuil_init2(): # max(max_intra, max_extra)
     dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
     dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
     seuil = dict()
@@ -163,26 +163,32 @@ def seuil_init2():
         for protein, distance in dist_extra[classe].values():
             if distance > max_extra:
                 max_extra = distance
-        seuil[classe] = min(max_intra, max_extra)
+        seuil[classe] = max(max_intra, max_extra)
     np.save("dataset/avg/seuil2.npy", seuil)
-
 
 # dict 1 classe --> dict 2
 # dict 2 protein --> vecteur
 def psiblastCode(classe_dict, seuil_avg):
+    start_time = time.time()
     cpt = 0     # number of familly ignored
-    test_dataset = open("./dataset/test1_dataset.list", "r")
+    test_dataset = open("./dataset/test_dataset.list", "r")
     test_cpt = 0
     for test_line in test_dataset: # Retriving the sequence
         test_prot = test_line.split()
         test_prot_name = test_prot[0]
         test_prot_class = test_prot[1]
-        print("test : ", test_prot_name)
+        # print("test : ", test_prot_name)
         test_cpt += 1
+
+        if test_cpt % 50 == 0:
+            elapsed_time = time.time() - start_time
+            print("50 sequences test traitee en : ", elapsed_time, "s")
+            start_time = time.time() # Reset timer
+            print(test_cpt, "sequences test traitee")
 
         valid_class = None      # Used to skip unneeded comparison
         previous_class = None   # Used to check if a family is never under the threshold
-        train_dataset = open("./dataset/train1_dataset.list", "r")
+        train_dataset = open("./dataset/train_dataset.list", "r")
 
         train_cpt = 0
         for train_line in train_dataset:
@@ -192,30 +198,28 @@ def psiblastCode(classe_dict, seuil_avg):
             train_cpt += 1
             
             if train_prot_class != previous_class and previous_class != valid_class:  # Check if we are comparing with another family and the previous one wasn't valid
-                print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------\n")
+                # print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------\n")
                 cpt += 1
 
-            if train_prot_class != previous_class:
-                print("Valeur du seuil pour la famille", train_prot_class, ":", seuil_avg[train_prot_class], "\n-------------")
+            # if train_prot_class != previous_class:
+            #     print("Valeur du seuil pour la famille", train_prot_class, ":", seuil_avg[train_prot_class], "\n-------------")
 
             if train_prot_class == valid_class:
                 os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
                 continue
             
             dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
-            print("dist(", test_prot_name, ",", train_prot_name, ")",  ":", dist)
+            # print("dist(", test_prot_name, ",", train_prot_name, ")",  ":", dist)
             if dist < seuil_avg[train_prot_class]:
-                print("Lancement de psiblast pour", test_prot_name, "et la famille", train_prot_class)
+                # print("Lancement de psiblast pour", test_prot_name, "et la famille", train_prot_class)
                 valid_class = train_prot_class # Current examined class is approved for psiblast 
                 os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
             
             previous_class = train_prot_class
         if previous_class != valid_class:  # Check if we are comparing with another family and the previous one wasn't valid
-            print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------")
+            # print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------")
             cpt += 1
         train_dataset.close
-        print("train_cpt : ", train_cpt)
     test_dataset.close
     print("Nombre de famille ignorees : ", cpt)
-    print("test_cpt : ", test_cpt)
     np.save("dataset/psiblast_res/comp_gain.npy", cpt)
