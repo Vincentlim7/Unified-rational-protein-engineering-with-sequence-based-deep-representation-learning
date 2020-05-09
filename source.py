@@ -7,7 +7,7 @@
 
 # Use the 64-unit or the 1900-unit model?
 
-# In[1]:
+# In[ ]:
 
 
 USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 64 dimensional one.
@@ -15,7 +15,7 @@ USE_FULL_1900_DIM_MODEL = False # if True use 1900 dimensional model, else use 6
 
 # ## Setup
 
-# In[2]:
+# In[ ]:
 
 
 # to allow autoreload of utils.py
@@ -55,7 +55,7 @@ else:
 
 # Initialize UniRep, also referred to as the "babbler" in our code. You need to provide the batch size you will use and the path to the weight directory.
 
-# In[3]:
+# In[ ]:
 
 
 batch_size = 12
@@ -96,7 +96,7 @@ utils.seuil_init()
 
 # Load data with numpy.load("path to binary file containing data")
 
-# In[7]:
+# In[ ]:
 
 
 classes_avg = np.load("dataset/avg/data_avg.npy")[()]
@@ -181,4 +181,11 @@ for key, val in dist_extra_avg["a.104.1.1"].items():
     if val[1] > y:
         y = val[1]
 print("max :",y)
+
+
+# In[ ]:
+
+
+x = np.load("dataset/psiblast_res/comp_gain.npy")
+print(x)
 
