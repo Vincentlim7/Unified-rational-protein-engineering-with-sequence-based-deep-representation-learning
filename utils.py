@@ -157,8 +157,6 @@ def seuil_init2(): # max(max_intra, min_extra)
         max_intra = 0
         min_extra = np.inf
         for protein, distance in dist_intra[classe].values():
-            if distance == np.inf:
-                print("DISTANCE = INF")
             if distance > max_intra:
                 max_intra = distance
         for protein, distance in dist_extra[classe].values():
@@ -170,8 +168,10 @@ def seuil_init2(): # max(max_intra, min_extra)
 # dict 1 classe --> dict 2
 # dict 2 protein --> vecteur
 def psiblastCode(classe_dict, seuil_avg):
+    dist_time = 0
+    comp_time = 0
     start_time = time.time()
-    cpt = 0     # number of familly ignored
+    cpt = 0     # number of sequence ignored
     test_dataset = open("./dataset/test_dataset.list", "r")
     test_cpt = 0
     for test_line in test_dataset: # Retriving the sequence
@@ -189,38 +189,56 @@ def psiblastCode(classe_dict, seuil_avg):
 
         valid_class = None      # Used to skip unneeded comparison
         previous_class = None   # Used to check if a family is never under the threshold
+        prot_list = []
         train_dataset = open("./dataset/train_dataset.list", "r")
 
-        train_cpt = 0
         for train_line in train_dataset:
             train_prot = train_line.split()
             train_prot_name = train_prot[0]
             train_prot_class = train_prot[1]
-            train_cpt += 1
             
-            if train_prot_class != previous_class and previous_class != valid_class:  # Check if we are comparing with another family and the previous one wasn't valid
-                # print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------\n")
-                cpt += 1
-
-            # if train_prot_class != previous_class:
-            #     print("Valeur du seuil pour la famille", train_prot_class, ":", seuil_avg[train_prot_class], "\n-------------")
-
-            if train_prot_class == valid_class:
-                os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
-                continue
+            if train_prot_class != previous_class: # Check if we are processing a new family
+                if previous_class != valid_class:  # Check if the previous family wasn't valid
+                    # print("-------------\n","La famille", previous_class, "contenant", len(prot_list), "sequences a ete ignore","\n-------------\n")
+                    cpt += len(prot_list)
+                    # print("CPT = ", cpt)
+                prot_list = [train_prot_name]
+            else:
+                if train_prot_class == valid_class:
+                    start_comp_time = time.time()
+                    os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
+                    elapsed_comp_time = time.time() - start_comp_time
+                    comp_time += elapsed_comp_time
+                    continue
+                else:
+                    prot_list.append(train_prot_name)
             
+            start_dist_time = time.time()
             dist = distance.euclidean(classe_dict[test_prot_class][test_prot_name], classe_dict[train_prot_class][train_prot_name])
+            elapsed_dist_time = time.time() - start_dist_time
+            dist_time += elapsed_dist_time
+
             # print("dist(", test_prot_name, ",", train_prot_name, ")",  ":", dist)
             if dist < seuil_avg[train_prot_class]:
                 # print("Lancement de psiblast pour", test_prot_name, "et la famille", train_prot_class)
                 valid_class = train_prot_class # Current examined class is approved for psiblast 
-                os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + train_prot_name)
-            
+
+                for prot_name in prot_list:
+                    start_comp_time = time.time()
+                    os.system('bash scripts/psiblast_script.sh ' + test_prot_name + ' ' + prot_name)
+                    elapsed_comp_time = time.time() - start_comp_time
+                    comp_time += elapsed_comp_time
+
             previous_class = train_prot_class
         if previous_class != valid_class:  # Check if we are comparing with another family and the previous one wasn't valid
-            # print("-------------\n","La famille", previous_class, "a ete ignore","\n-------------")
-            cpt += 1
+            # print("-------------\n","La famille", previous_class, "contenant", len(prot_list), "sequences a ete ignore","\n-------------\n")
+            cpt += len(prot_list)
+        
         train_dataset.close
     test_dataset.close
-    print("Nombre de famille ignorees : ", cpt)
+    print("Temps de calculs de distance : ", dist_time, "s")
+    print("Temps de calculs Psiblast : ", comp_time, "s")
+    print("Nombre de comparaisons ignorees : ", cpt)
+    np.save("dataset/psiblast_res/dist_time.npy", dist_time)
+    np.save("dataset/psiblast_res/comp_time.npy", comp_time)
     np.save("dataset/psiblast_res/comp_gain.npy", cpt)

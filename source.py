@@ -189,3 +189,11 @@ print("max :",y)
 x = np.load("dataset/psiblast_res/comp_gain.npy")
 print(x)
 
+
+# In[ ]:
+
+
+x=[1,2,3,4,4,5,5]
+for i in x:
+    print(i)
+
