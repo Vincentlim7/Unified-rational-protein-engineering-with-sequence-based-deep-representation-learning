@@ -133,24 +133,7 @@ def histo(dist_intra, dist_extra, avg):
     plt.legend(loc='upper right')
     plt.show()
 
-
-def seuil_init(): # min(min_intra, min_extra)
-    dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
-    dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
-    seuil = dict()
-    for classe, dist_lis in dist_intra.items():
-        min_intra = np.inf
-        min_extra = np.inf
-        for protein, distance in dist_intra[classe].values():
-            if distance < min_intra:
-                min_intra = distance
-        for protein, distance in dist_extra[classe].values():
-            if distance < min_extra:
-                min_extra = distance
-        seuil[classe] = min(min_intra, min_extra)
-    np.save("dataset/avg/seuil.npy", seuil)
-
-def seuil_init2(): # max(max_intra, max_extra)
+def seuil_init(): # max(max_intra, max_extra)
     dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
     dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
     seuil = dict()
@@ -164,6 +147,24 @@ def seuil_init2(): # max(max_intra, max_extra)
             if distance > max_extra:
                 max_extra = distance
         seuil[classe] = max(max_intra, max_extra)
+    np.save("dataset/avg/seuil.npy", seuil)
+
+def seuil_init2(): # max(max_intra, min_extra)
+    dist_intra = np.load("dataset/avg/dist_intra_avg.npy")[()]
+    dist_extra = np.load("dataset/avg/dist_extra_avg.npy")[()]
+    seuil = dict()
+    for classe, dist_lis in dist_intra.items():
+        max_intra = 0
+        min_extra = np.inf
+        for protein, distance in dist_intra[classe].values():
+            if distance == np.inf:
+                print("DISTANCE = INF")
+            if distance > max_intra:
+                max_intra = distance
+        for protein, distance in dist_extra[classe].values():
+            if distance < min_extra:
+                min_extra = distance
+        seuil[classe] = max(max_intra, min_extra)
     np.save("dataset/avg/seuil2.npy", seuil)
 
 # dict 1 classe --> dict 2
