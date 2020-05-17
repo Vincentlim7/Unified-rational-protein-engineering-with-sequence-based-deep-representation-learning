@@ -230,6 +230,8 @@ def psiblastCode(classe_dict, seuil_avg):
                     comp_time += elapsed_comp_time
 
             previous_class = train_prot_class
+        
+        # Case where it's the last familly of the list
         if previous_class != valid_class:  # Check if we are comparing with another family and the previous one wasn't valid
             # print("-------------\n","La famille", previous_class, "contenant", len(prot_list), "sequences a ete ignore","\n-------------\n")
             cpt += len(prot_list)
